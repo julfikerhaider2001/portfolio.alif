@@ -1564,6 +1564,75 @@
   <!-- THREE.JS STL VIEWER -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    /**
+     * Inline STLLoader for Three.js r128
+     * Parses binary and ASCII STL files into BufferGeometry.
+     */
+    THREE.STLLoader = class extends THREE.Loader {
+      load(url, onLoad, onProgress, onError) {
+        const loader = new THREE.FileLoader(this.manager);
+        loader.setPath(this.path);
+        loader.setResponseType('arraybuffer');
+        loader.setRequestHeader(this.requestHeader);
+        loader.setWithCredentials(this.withCredentials);
+        loader.load(url, (data) => {
+          try { onLoad(this.parse(data)); }
+          catch (e) { if (onError) onError(e); else console.error(e); this.manager.itemError(url); }
+        }, onProgress, onError);
+      }
+      parse(data) {
+        const isBinary = (d) => {
+          const dv = new DataView(d);
+          if (dv.byteLength < 84) return false;
+          const numFaces = dv.getUint32(80, true);
+          return 84 + numFaces * 50 === dv.byteLength;
+        };
+        if (isBinary(data)) return this._parseBinary(data);
+        return this._parseASCII(new TextDecoder().decode(data));
+      }
+      _parseBinary(data) {
+        const dv = new DataView(data);
+        const numFaces = dv.getUint32(80, true);
+        const vertices = new Float32Array(numFaces * 9);
+        const normals = new Float32Array(numFaces * 9);
+        let offset = 84;
+        for (let f = 0; f < numFaces; f++) {
+          const nx = dv.getFloat32(offset, true); offset += 4;
+          const ny = dv.getFloat32(offset, true); offset += 4;
+          const nz = dv.getFloat32(offset, true); offset += 4;
+          for (let v = 0; v < 3; v++) {
+            const vi = f * 9 + v * 3;
+            vertices[vi] = dv.getFloat32(offset, true); offset += 4;
+            vertices[vi + 1] = dv.getFloat32(offset, true); offset += 4;
+            vertices[vi + 2] = dv.getFloat32(offset, true); offset += 4;
+            normals[vi] = nx; normals[vi + 1] = ny; normals[vi + 2] = nz;
+          }
+          offset += 2; // attribute byte count
+        }
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        geo.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        return geo;
+      }
+      _parseASCII(data) {
+        const faceRe = /facet\s+normal\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+outer\s+loop\s+vertex\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+vertex\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+vertex\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+([\d.eE+\-]+)\s+endloop\s+endfacet/gi;
+        const verts = [], norms = [];
+        let r;
+        while ((r = faceRe.exec(data)) !== null) {
+          const nx = parseFloat(r[1]), ny = parseFloat(r[2]), nz = parseFloat(r[3]);
+          for (let v = 0; v < 3; v++) {
+            verts.push(parseFloat(r[4 + v * 3]), parseFloat(r[5 + v * 3]), parseFloat(r[6 + v * 3]));
+            norms.push(nx, ny, nz);
+          }
+        }
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+        geo.setAttribute('normal', new THREE.Float32BufferAttribute(norms, 3));
+        return geo;
+      }
+    };
+  </script>
+  <script>
     (function () {
       const container = document.getElementById('stl-canvas-container');
       const canvas = document.getElementById('stl-canvas');
@@ -1576,18 +1645,23 @@
       renderer.setSize(W, H);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0f1520);
-      scene.fog = new THREE.FogExp2(0x0f1520, 0.04);
+      scene.fog = new THREE.FogExp2(0x0f1520, 0.008);
 
-      const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
+      const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 1000);
       camera.position.set(3.5, 2.5, 4);
       camera.lookAt(0, 0, 0);
 
       // Lighting
       const ambient = new THREE.AmbientLight(0x1a2a4a, 1.5);
       scene.add(ambient);
+
+      const hemiLight = new THREE.HemisphereLight(0x3b82f6, 0x0f1520, 0.8);
+      scene.add(hemiLight);
 
       const keyLight = new THREE.DirectionalLight(0x3b82f6, 2.5);
       keyLight.position.set(4, 6, 3);
@@ -1598,178 +1672,90 @@
       fillLight.position.set(-4, 2, -2);
       scene.add(fillLight);
 
-      const rimLight = new THREE.PointLight(0x60a5fa, 1.5, 15);
+      const rimLight = new THREE.PointLight(0x60a5fa, 1.5, 50);
       rimLight.position.set(-3, 3, -4);
       scene.add(rimLight);
 
+      const bottomLight = new THREE.PointLight(0x3b82f6, 0.8, 30);
+      bottomLight.position.set(0, -5, 0);
+      scene.add(bottomLight);
+
       // Ground grid
-      const gridHelper = new THREE.GridHelper(12, 24, 0x1e3a5f, 0x0f2040);
-      gridHelper.position.y = -1.3;
+      const gridHelper = new THREE.GridHelper(20, 40, 0x1e3a5f, 0x0f2040);
+      gridHelper.position.y = -2;
       scene.add(gridHelper);
 
       // ENCLOSURE GROUP
       const group = new THREE.Group();
       scene.add(group);
 
-      const matBody = new THREE.MeshStandardMaterial({
-        color: 0x1a1f2e,
-        roughness: 0.6,
-        metalness: 0.4,
-        envMapIntensity: 0.8
-      });
+      // Loading indicator
+      const stlLabel = container.querySelector('.stl-label');
+      if (stlLabel) stlLabel.textContent = 'Loading STL model...';
 
-      const matAccent = new THREE.MeshStandardMaterial({
-        color: 0x3b82f6,
-        roughness: 0.3,
-        metalness: 0.8,
-        emissive: 0x1e3a80,
-        emissiveIntensity: 0.3
-      });
+      // Load STL
+      const loader = new THREE.STLLoader();
+      loader.load('New_encloser_design.stl', function (geometry) {
+        // Compute normals for smooth shading
+        geometry.computeVertexNormals();
 
-      const matPanel = new THREE.MeshStandardMaterial({
-        color: 0x252d42,
-        roughness: 0.7,
-        metalness: 0.3
-      });
+        // Center the geometry
+        geometry.computeBoundingBox();
+        const box = geometry.boundingBox;
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        geometry.translate(-center.x, -center.y, -center.z);
 
-      const matLed = new THREE.MeshStandardMaterial({
-        color: 0x10b981,
-        emissive: 0x10b981,
-        emissiveIntensity: 2,
-        roughness: 0.1,
-        metalness: 0
-      });
+        // Scale to fit nicely in view
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scaleFactor = 4.0 / maxDim;
+        geometry.scale(scaleFactor, scaleFactor, scaleFactor);
 
-      const matLedBlue = new THREE.MeshStandardMaterial({
-        color: 0x3b82f6,
-        emissive: 0x3b82f6,
-        emissiveIntensity: 2,
-        roughness: 0.1,
-        metalness: 0
-      });
-
-      const matConnector = new THREE.MeshStandardMaterial({
-        color: 0x4a5568,
-        roughness: 0.4,
-        metalness: 0.7
-      });
-
-      const matLabel = new THREE.MeshStandardMaterial({
-        color: 0xe2e8f0,
-        roughness: 0.9,
-        metalness: 0
-      });
-
-      // Main body
-      const bodyGeo = new THREE.BoxGeometry(2.96, 1.24, 2.0);
-      const body = new THREE.Mesh(bodyGeo, matBody);
-      body.castShadow = true;
-      body.receiveShadow = true;
-      group.add(body);
-
-      // Front face panel
-      const faceGeo = new THREE.BoxGeometry(2.97, 1.25, 0.05);
-      const face = new THREE.Mesh(faceGeo, matPanel);
-      face.position.z = 1.025;
-      group.add(face);
-
-      // Label plate
-      const labelGeo = new THREE.BoxGeometry(1.4, 0.3, 0.01);
-      const label = new THREE.Mesh(labelGeo, matLabel);
-      label.position.set(-0.5, 0.3, 1.06);
-      group.add(label);
-
-      // LED indicators (3 channels)
-      const ledPositions = [-1.1, -0.85, -0.6];
-      const ledMats = [matLed, matLedBlue, matLedBlue];
-      ledPositions.forEach((x, i) => {
-        const ledGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.04, 12);
-        const led = new THREE.Mesh(ledGeo, ledMats[i]);
-        led.rotation.x = Math.PI / 2;
-        led.position.set(x, 0.4, 1.06);
-        group.add(led);
-
-        // Glow
-        const glowGeo = new THREE.SphereGeometry(0.07, 8, 8);
-        const glowMat = new THREE.MeshStandardMaterial({
-          color: ledMats[i].color,
-          emissive: ledMats[i].emissive,
-          emissiveIntensity: 0.5,
-          transparent: true,
-          opacity: 0.3
+        // Material — premium dark industrial look
+        const material = new THREE.MeshStandardMaterial({
+          color: 0x1e2a3e,
+          roughness: 0.45,
+          metalness: 0.6,
+          envMapIntensity: 1.0,
+          flatShading: false
         });
-        const glow = new THREE.Mesh(glowGeo, glowMat);
-        glow.position.set(x, 0.4, 1.09);
-        group.add(glow);
+
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+
+        // Add subtle edge glow via a slightly larger wireframe overlay
+        const edgeMat = new THREE.MeshBasicMaterial({
+          color: 0x3b82f6,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.04
+        });
+        const edgeMesh = new THREE.Mesh(geometry.clone(), edgeMat);
+        edgeMesh.scale.setScalar(1.002);
+        group.add(edgeMesh);
+
+        // Update label
+        if (stlLabel) stlLabel.textContent = 'CareFlow V1 — Enclosure.stl · Interactive 3D';
+
+        // Recompute bounding for grid position
+        geometry.computeBoundingBox();
+        const newBox = geometry.boundingBox;
+        gridHelper.position.y = newBox.min.y - 0.1;
+
+      }, function (xhr) {
+        // Progress
+        if (xhr.lengthComputable && stlLabel) {
+          const pct = Math.round((xhr.loaded / xhr.total) * 100);
+          stlLabel.textContent = 'Loading STL... ' + pct + '%';
+        }
+      }, function (error) {
+        console.error('Error loading STL:', error);
+        if (stlLabel) stlLabel.textContent = 'Error loading model';
       });
-
-      // RS485 / Power terminal blocks (bottom)
-      for (let i = 0; i < 6; i++) {
-        const termGeo = new THREE.BoxGeometry(0.22, 0.28, 0.22);
-        const term = new THREE.Mesh(termGeo, matConnector);
-        term.position.set(-1.1 + i * 0.44, -0.48, 0.9);
-        group.add(term);
-
-        // Screw head
-        const screwGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.04, 8);
-        const screw = new THREE.Mesh(screwGeo, matAccent);
-        screw.position.set(-1.1 + i * 0.44, -0.35, 0.9);
-        group.add(screw);
-      }
-
-      // Cable glands
-      const glandPositions = [-1.0, -0.4, 0.2, 0.8];
-      glandPositions.forEach(x => {
-        const glandGeo = new THREE.CylinderGeometry(0.1, 0.12, 0.18, 16);
-        const gland = new THREE.Mesh(glandGeo, matConnector);
-        gland.rotation.x = Math.PI / 2;
-        gland.position.set(x, -0.45, -1.1);
-        group.add(gland);
-
-        const ringGeo = new THREE.TorusGeometry(0.1, 0.025, 8, 16);
-        const ring = new THREE.Mesh(ringGeo, matAccent);
-        ring.position.set(x, -0.45, -1.12);
-        group.add(ring);
-      });
-
-      // DIN rail clip
-      const dinGeo = new THREE.BoxGeometry(2.4, 0.12, 0.3);
-      const din = new THREE.Mesh(dinGeo, matAccent);
-      din.position.set(0, -0.63, -0.4);
-      group.add(din);
-
-      // Mounting screws (corners)
-      [[1.3, 0.5], [1.3, -0.5], [-1.3, 0.5], [-1.3, -0.5]].forEach(([x, y]) => {
-        const scrGeo = new THREE.CylinderGeometry(0.055, 0.055, 0.06, 8);
-        const scr = new THREE.Mesh(scrGeo, matConnector);
-        scr.rotation.x = Math.PI / 2;
-        scr.position.set(x, y, 1.06);
-        group.add(scr);
-      });
-
-      // Antenna port
-      const antGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.15, 12);
-      const ant = new THREE.Mesh(antGeo, matConnector);
-      ant.rotation.z = Math.PI / 2;
-      ant.position.set(1.55, 0.42, 0);
-      group.add(ant);
-
-      const antCapGeo = new THREE.SphereGeometry(0.09, 10, 10);
-      const antCap = new THREE.Mesh(antCapGeo, matAccent);
-      antCap.position.set(1.63, 0.42, 0);
-      group.add(antCap);
-
-      // Edge highlight strips
-      const edgeGeo = new THREE.BoxGeometry(3.0, 0.04, 0.04);
-      const edgeTop = new THREE.Mesh(edgeGeo, matAccent);
-      edgeTop.position.set(0, 0.62, 1.0);
-      group.add(edgeTop);
-
-      const edgeBot = new THREE.Mesh(edgeGeo, matAccent);
-      edgeBot.position.set(0, -0.62, 1.0);
-      group.add(edgeBot);
-
-      group.position.y = -0.1;
 
       // Orbit controls (manual)
       let isDragging = false;
@@ -1777,7 +1763,6 @@
       let theta = 0.4;
       let phi = 0.5;
       let radius = 6;
-      let exploded = false;
       let wireframe = false;
       const defaultTheta = 0.4, defaultPhi = 0.5, defaultRadius = 6;
 
@@ -1807,8 +1792,9 @@
       });
 
       canvas.addEventListener('wheel', e => {
-        radius = Math.max(3, Math.min(12, radius + e.deltaY * 0.01));
-      });
+        e.preventDefault();
+        radius = Math.max(2, Math.min(15, radius + e.deltaY * 0.01));
+      }, { passive: false });
 
       document.getElementById('btn-reset').addEventListener('click', () => {
         theta = defaultTheta; phi = defaultPhi; radius = defaultRadius;
@@ -1827,9 +1813,9 @@
         });
       });
 
-      let explodeOffset = 0;
+      let autoRotate = true;
       document.getElementById('btn-explode').addEventListener('click', () => {
-        exploded = !exploded;
+        autoRotate = !autoRotate;
       });
 
       // Animate
@@ -1838,15 +1824,7 @@
         requestAnimationFrame(animate);
         t += 0.012;
 
-        if (!isDragging) theta += 0.003;
-
-        const ex = exploded ? Math.sin(t * 0.5) * 0.5 + 0.5 : 0;
-        face.position.z = 1.025 + ex * 0.8;
-        label.position.z = 1.06 + ex * 0.82;
-        din.position.y = -0.63 - ex * 0.5;
-
-        // LED pulse
-        ledMats[0].emissiveIntensity = 1.5 + Math.sin(t * 2) * 0.5;
+        if (!isDragging && autoRotate) theta += 0.003;
 
         camera.position.x = radius * Math.sin(theta) * Math.cos(phi);
         camera.position.y = radius * Math.sin(phi);
