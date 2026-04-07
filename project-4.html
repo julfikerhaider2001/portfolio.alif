@@ -1,65 +1,676 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
-
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Water Monitoring station | Julfiker Ibn Haider</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-    rel="stylesheet" />
-  <script id="tailwind-config">
-    tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" }, fontFamily: { "display": ["Space Grotesk"] } } } }
-  </script>
-  <style>
-    body {
-      font-family: "Space Grotesk", sans-serif;
-    }
-  </style>
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Southern Water Monitor — Aquanode V1 | Julfiker Ibn Haider</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg-deep: #0a0c10;
+  --bg-card: #11141c;
+  --border-subtle: #1e2a3a;
+  --primary: #1e88e5;
+  --primary-glow: rgba(30, 136, 229, 0.35);
+  --primary-hover: #42a5f5;
+  --text-light: #eef2ff;
+  --text-dim: #9aa9bb;
+  --text-muted: #5f6c80;
+}
 
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
-  <header
-    class="border-b border-solid border-slate-200 dark:border-slate-800 px-6 md:px-20 py-4 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-50 flex items-center">
-    <a href="index.html"
-      class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-primary transition-colors font-medium">
-      <span class="material-symbols-outlined">arrow_back</span> Back to Portfolio
-    </a>
-  </header>
-  <main class="flex-1 px-6 md:px-20 py-10 max-w-[1000px] mx-auto w-full">
-    <div class="mb-8">
-      <span class="text-primary font-bold tracking-widest uppercase text-sm">Testing & QA</span>
-      <h1 class="text-4xl md:text-5xl font-black mt-2 mb-4 text-slate-900 dark:text-white">Sensor Testing Station</h1>
-      <div class="flex flex-wrap gap-2 mb-8">
-        <span class="px-3 py-1 text-xs font-bold bg-primary/10 text-primary rounded-full">Arduino Mega</span>
-        <span class="px-3 py-1 text-xs font-bold bg-primary/10 text-primary rounded-full">Sensors</span>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-light);
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  background: rgba(10, 12, 16, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.3px;
+  background: linear-gradient(120deg, #fff, var(--primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--primary);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 32px;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(30, 136, 229, 0.12);
+  border-radius: 30px;
+  padding: 6px 14px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: 24px;
+  border: 1px solid rgba(30, 136, 229, 0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 40px;
+}
+
+.tag {
+  background: rgba(30, 136, 229, 0.12);
+  border-radius: 30px;
+  font-size: 0.7rem;
+  padding: 6px 14px;
+  color: var(--primary);
+  border: 1px solid rgba(30, 136, 229, 0.3);
+}
+
+.hero-img {
+  width: 100%;
+  height: 400px;
+  background: var(--bg-card);
+  border-radius: 20px;
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 60px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.section {
+  margin-bottom: 60px;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+}
+
+.section-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin: 32px 0;
+}
+
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 32px 0;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.card:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+
+.spec-list {
+  list-style: none;
+}
+
+.spec-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.spec-list li:last-child {
+  border-bottom: none;
+}
+
+.spec-key {
+  color: var(--text-dim);
+}
+
+.spec-val {
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+}
+
+th {
+  background: var(--primary);
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+tr:hover td {
+  background: rgba(30, 136, 229, 0.05);
+}
+
+.highlight-box {
+  background: rgba(30, 136, 229, 0.08);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.cost-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 32px 0;
+}
+
+.cost-box {
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.cost-box.highlighted {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.cost-box:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+}
+
+.cost-label {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.cost-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.cost-box.highlighted .cost-label,
+.cost-box.highlighted .cost-value,
+.cost-box.highlighted .cost-note {
+  color: white;
+}
+
+.cost-note {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+ul {
+  padding-left: 24px;
+  line-height: 1.8;
+}
+
+footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 40px 32px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .two-col, .three-col, .cost-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .container {
+    padding: 40px 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">JULFIKER IBN HAIDER</a>
+  <div class="nav-links">
+    <a href="index.html#projects">← Back to Portfolio</a>
+    <a href="My_CV.pdf" target="_blank">Resume</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> / <a href="index.html#projects">Projects</a> / Southern Water Monitor
+  </div>
+
+  <div class="hero-badge">IoT • Aquanode V1</div>
+  <h1>Southern Water Monitor</h1>
+  <div class="subtitle">Autonomous IoT Water Tank Monitoring & Pump Control System</div>
+  
+  <div class="tags">
+    <span class="tag">ESP32</span>
+    <span class="tag">IoT</span>
+    <span class="tag">BLE</span>
+    <span class="tag">WiFi</span>
+    <span class="tag">Ultrasonic Sensor</span>
+    <span class="tag">Solid State Relay</span>
+    <span class="tag">Home Automation</span>
+  </div>
+
+  <div class="hero-img">
+    <img src="Aquanode.png" alt="Southern Water Monitor">
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="section">
+    <h2 class="section-title">1. Project Overview</h2>
+    <p>The Southern Water Monitor is a market-ready IoT product developed entirely in-house. The device autonomously monitors residential and commercial water tank levels, controls pump operation via a solid-state relay, and delivers real-time data to a web dashboard — all configurable wirelessly via Bluetooth Low Energy. This system eliminates the manual effort of monitoring water tank levels and manually operating water pumps.</p>
+    
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">AUTO Mode</div>
+        <p>The microcontroller continuously monitors the tank level and switches the pump ON when the level falls below the configured start threshold, and OFF when it reaches the stop threshold. Both thresholds are set via the mobile application.</p>
       </div>
-      <div class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 rounded-xl max-w-4xl shadow-xl">
-        <img class="w-full h-full object-cover" alt="Modular sensor testing station"
-          src="https://images.unsplash.com/photo-1590458145719-2169b1834927?auto=format&fit=crop&q=80" />
+      <div class="card">
+        <div class="card-title">MANUAL Mode</div>
+        <p>The internal DPDT switch physically bypasses the relay, routing mains power directly through the DP switch to the motor. The microcontroller is completely removed from the circuit, ensuring full operator control even in case of device failure.</p>
       </div>
     </div>
-    <div class="prose prose-slate dark:prose-invert max-w-none">
-      <h2 class="text-2xl font-bold mt-10 mb-4 text-slate-900 dark:text-white">Project Overview</h2>
-      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-        A project made for real time water monitoring and controlling the water level by controlling the pump in a
-        precise way to make the system more efficient and reliable.
-      </p>
-      <h3 class="text-xl font-bold mt-8 mb-3 text-slate-900 dark:text-white">Highlight Details</h3>
-      <ul class="list-disc list-inside text-slate-600 dark:text-slate-400 leading-relaxed space-y-2 mb-6">
-        <li>Custom PCB breakout boards for rapid sensor connections.</li>
-        <li>Firmware specifically optimized to test edge cases.</li>
-        <li>Automated data logging via serial to local databases.</li>
-        <li>Cost-effective and scalable setup.</li>
+
+    <h3 class="section-subtitle">Key Capabilities</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-title">✓ Wireless Configuration</div>
+        <p>BLE configuration — no hotspot, no laptop required</p>
+      </div>
+      <div class="card">
+        <div class="card-title">✓ Real-time Monitoring</div>
+        <p>Ultrasonic sensor for accurate level measurement</p>
+      </div>
+      <div class="card">
+        <div class="card-title">✓ Silent Control</div>
+        <p>Solid State Relay (SSR) for pump switching</p>
+      </div>
+      <div class="card">
+        <div class="card-title">✓ Safety Features</div>
+        <p>30-minute overtime pump protection cutoff</p>
+      </div>
+      <div class="card">
+        <div class="card-title">✓ Web Dashboard</div>
+        <p>Local web interface accessible on same network</p>
+      </div>
+      <div class="card">
+        <div class="card-title">✓ Factory Reset</div>
+        <p>Double-reset feature — no button required</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECHNICAL SPECS -->
+  <div class="section">
+    <h2 class="section-title">2. Technical Specifications</h2>
+    <div class="two-col">
+      <ul class="spec-list">
+        <li><span class="spec-key">Microcontroller</span><span class="spec-val">ESP32 (240MHz, 520KB RAM)</span></li>
+        <li><span class="spec-key">Connectivity</span><span class="spec-val">WiFi 2.4GHz + BLE 5.0</span></li>
+        <li><span class="spec-key">Power Supply</span><span class="spec-val">230V AC via HiLink PM01</span></li>
+        <li><span class="spec-key">Sensor</span><span class="spec-val">HC-SR04 Ultrasonic, 2cm–400cm</span></li>
+        <li><span class="spec-key">Switch Rating</span><span class="spec-val">SSR 280V / 40A AC</span></li>
+      </ul>
+      <ul class="spec-list">
+        <li><span class="spec-key">Config Interface</span><span class="spec-val">Bluetooth LE (nRF / App)</span></li>
+        <li><span class="spec-key">API Protocol</span><span class="spec-val">HTTP JSON REST</span></li>
+        <li><span class="spec-key">Tank Height Range</span><span class="spec-val">10cm – 500cm</span></li>
+        <li><span class="spec-key">Firmware Version</span><span class="spec-val">v2.0.1</span></li>
+        <li><span class="spec-key">Safety</span><span class="spec-val">30-min overtime pump cutoff</span></li>
       </ul>
     </div>
-  </main>
-  <footer
-    class="border-t border-slate-200 dark:border-slate-800 py-6 px-6 md:px-20 bg-slate-50 dark:bg-background-dark flex justify-center text-slate-500 dark:text-slate-400 text-sm">
-    © 2024 Julfiker Ibn Haider.
-  </footer>
-</body>
+  </div>
 
+  <!-- BILL OF MATERIALS -->
+  <div class="section">
+    <h2 class="section-title">3. Bill of Materials</h2>
+    <p>The following table enumerates all components required for a single production unit. Prices reflect approximate retail procurement costs. Bulk procurement at 50+ units is expected to reduce component costs by 30–40%.</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Component</th>
+          <th>Specification</th>
+          <th>Qty</th>
+          <th style="text-align:right">Unit Cost (USD)</th>
+          <th style="text-align:right">Line Total (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>ESP32 Development Board</td>
+          <td>ESP32-WROOM-32, 38-pin</td>
+          <td>1</td>
+          <td style="text-align:right">3.50</td>
+          <td style="text-align:right">3.50</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Ultrasonic Sensor</td>
+          <td>HC-SR04, 5V, 2–400cm</td>
+          <td>1</td>
+          <td style="text-align:right">0.80</td>
+          <td style="text-align:right">0.80</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Solid State Relay Module</td>
+          <td>280V AC / 40A, optocoupler isolated</td>
+          <td>1</td>
+          <td style="text-align:right">4.50</td>
+          <td style="text-align:right">4.50</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>DPDT Toggle Switch</td>
+          <td>15A / 250V AC, panel mount</td>
+          <td>1</td>
+          <td style="text-align:right">0.60</td>
+          <td style="text-align:right">0.60</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>HiLink Power Module</td>
+          <td>PM01, 230V AC → 5V DC, 3W</td>
+          <td>1</td>
+          <td style="text-align:right">2.20</td>
+          <td style="text-align:right">2.20</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>LED Indicators</td>
+          <td>5mm, Red / Green / Blue / Yellow</td>
+          <td>4</td>
+          <td style="text-align:right">0.05</td>
+          <td style="text-align:right">0.20</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Resistors (220Ω, 10kΩ)</td>
+          <td>1/4W, ±5%</td>
+          <td>8</td>
+          <td style="text-align:right">0.02</td>
+          <td style="text-align:right">0.16</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Terminal Blocks</td>
+          <td>Screw type, 3-pin (N, L, L1)</td>
+          <td>2</td>
+          <td style="text-align:right">0.30</td>
+          <td style="text-align:right">0.60</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Enclosure Box</td>
+          <td>ABS plastic, DIN rail compatible, IP54</td>
+          <td>1</td>
+          <td style="text-align:right">3.00</td>
+          <td style="text-align:right">3.00</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Cable Gland</td>
+          <td>PG9, waterproof, nylon</td>
+          <td>2</td>
+          <td style="text-align:right">0.25</td>
+          <td style="text-align:right">0.50</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Sensor Cable</td>
+          <td>4-core shielded, per meter</td>
+          <td>5</td>
+          <td style="text-align:right">0.30</td>
+          <td style="text-align:right">1.50</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>PCB / Prototype Board</td>
+          <td>Custom or perfboard, 100×80mm</td>
+          <td>1</td>
+          <td style="text-align:right">1.20</td>
+          <td style="text-align:right">1.20</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>Wiring, Connectors, Hardware</td>
+          <td>Misc. assembly materials</td>
+          <td>1</td>
+          <td style="text-align:right">1.50</td>
+          <td style="text-align:right">1.50</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5" style="text-align:right;padding-right:12px;font-weight:700;">TOTAL COMPONENT COST (1 unit)</td>
+          <td style="text-align:right;font-weight:700;">USD 20.26</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- COST ANALYSIS -->
+  <div class="section">
+    <h2 class="section-title">4. Cost Analysis & Pricing</h2>
+    
+    <div class="cost-grid">
+      <div class="cost-box">
+        <div class="cost-label">Component Cost</div>
+        <div class="cost-value">$20</div>
+        <div class="cost-note">Per unit, retail procurement</div>
+      </div>
+      <div class="cost-box">
+        <div class="cost-label">Total Mfg. Cost</div>
+        <div class="cost-value">$32</div>
+        <div class="cost-note">Including labour, overhead, packaging</div>
+      </div>
+      <div class="cost-box highlighted">
+        <div class="cost-label">Proposed Sell Price</div>
+        <div class="cost-value">$85</div>
+        <div class="cost-note">Retail — 165% gross margin</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="highlight-box">
+        <h3 style="margin-bottom:16px;color:var(--primary);">Manufacturing Cost Breakdown</h3>
+        <ul class="spec-list">
+          <li><span class="spec-key">Components (retail)</span><span class="spec-val">$20.26</span></li>
+          <li><span class="spec-key">Assembly labour (~2 hrs)</span><span class="spec-val">$6.00</span></li>
+          <li><span class="spec-key">Firmware flashing & QA</span><span class="spec-val">$2.00</span></li>
+          <li><span class="spec-key">Packaging & labelling</span><span class="spec-val">$2.00</span></li>
+          <li><span class="spec-key">Overhead & logistics (10%)</span><span class="spec-val">$2.00</span></li>
+          <li><span class="spec-key" style="font-weight:700;">Total Cost of Goods</span><span class="spec-val" style="font-weight:700;">~$32</span></li>
+        </ul>
+      </div>
+      <div class="highlight-box">
+        <h3 style="margin-bottom:16px;color:var(--primary);">Revenue Projection (50 units/month)</h3>
+        <ul class="spec-list">
+          <li><span class="spec-key">Revenue</span><span class="spec-val">$4,250</span></li>
+          <li><span class="spec-key">Cost of Goods</span><span class="spec-val">$1,600</span></li>
+          <li><span class="spec-key">Gross Profit</span><span class="spec-val">$2,650</span></li>
+          <li><span class="spec-key">Margin</span><span class="spec-val">62%</span></li>
+          <li><span class="spec-key">Bulk savings (−30%)</span><span class="spec-val">+$480</span></li>
+          <li><span class="spec-key" style="font-weight:700;">Adjusted Monthly Profit</span><span class="spec-val" style="font-weight:700;">~$3,130</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="margin-top:24px;color:var(--text-dim);">Note: At bulk procurement (50+ units), component cost reduces to approximately $14/unit, improving the gross margin to approximately 73% at the proposed retail price of $85. A premium tier at $120 with dashboard server subscription ($5/month) is also recommended as a recurring revenue model.</p>
+  </div>
+
+  <!-- FUTURE DEVELOPMENT -->
+  <div class="section">
+    <h2 class="section-title">5. Future Development Roadmap</h2>
+    <p>The following enhancements are proposed for subsequent product revisions, ordered by implementation priority and commercial impact.</p>
+
+    <div class="card" style="margin-top:24px;">
+      <div class="card-title">F1: Wireless Mode Selection</div>
+      <p>Elimination of physical DPDT switch. Once the optional cloud server infrastructure is deployed, the internal DPDT hard switch can be replaced with a software-controlled relay or MOSFET circuit. The AUTO/MANUAL mode transition would then be managed entirely through the dashboard or mobile application over the network.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">F2: Cloud Server Deployment</div>
+      <p>Migrate the Node.js dashboard from a local PC to a Raspberry Pi server. Devices register automatically over the internet via a polling model, eliminating the requirement for the client and server to be on the same network. This enables centralised management of multiple installations across different sites from a single dashboard.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">F3: Custom PCB Design & IP65 Enclosure</div>
+      <p>Design a custom PCB to replace the prototype board, reducing assembly time and improving reliability. Source an IP65-rated enclosure for outdoor installations.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">F4: Flutter Mobile Application</div>
+      <p>Develop the companion mobile application using Flutter to replace the manual nRF Connect BLE configuration process. The app would provide a guided setup wizard, live level gauge, pump control, push notifications for tank empty/overflow events, and historical usage graphs.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">F5: Water Quality Sensing & Flow Metering</div>
+      <p>Integration of turbidity, pH, and flow rate sensors to expand the product into a comprehensive water management platform. This positions Southern IoT for industrial and agricultural market segments with significantly higher average selling prices.</p>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="section">
+    <h2 class="section-title">6. Conclusion</h2>
+    <div class="highlight-box">
+      <p>The Southern Water Monitor represents a commercially viable, technically complete IoT product that can be brought to market with minimal additional investment. The prototype is fully functional, the firmware is stable, and the dashboard infrastructure is operational. With a manufacturing cost of approximately $32 per unit and a recommended retail price of $85, the product offers a strong 62% gross margin with clear pathways to improvement through bulk procurement and PCB optimisation.</p>
+      <p style="margin-top:16px;">It is recommended that a pilot production run of 20–30 units be initiated for market validation, targeted at residential customers and small commercial installations. Concurrent development of the mobile application and cloud infrastructure will position Southern IoT for scalable growth in the smart water management segment.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div>© 2025 Julfiker Ibn Haider — Embedded & IoT Engineer</div>
+  <div style="margin-top: 16px;">
+    <a href="index.html" style="color: var(--text-muted); margin: 0 12px;">Home</a>
+    <a href="index.html#projects" style="color: var(--text-muted); margin: 0 12px;">Projects</a>
+    <a href="My_CV.pdf" style="color: var(--text-muted);">Resume</a>
+  </div>
+</footer>
+
+</body>
 </html>

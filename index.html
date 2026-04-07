@@ -1,491 +1,937 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Julfiker Ibn Haider | IoT &amp; Embedded Systems Portfolio</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-    rel="stylesheet" />
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#137fec",
-            "background-light": "#f6f7f8",
-            "background-dark": "#101922",
-          },
-          fontFamily: {
-            "display": ["Space Grotesk"]
-          },
-          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-        },
-      },
-    }
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Julfiker Ibn Haider | Embedded & IoT Engineer</title>
+  <!-- Google Fonts: Space Grotesk + JetBrains Mono -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-deep: #0a0c10;
+      --bg-card: #11141c;
+      --border-subtle: #1e2a3a;
+      --primary: #1e88e5;
+      --primary-glow: rgba(30, 136, 229, 0.35);
+      --primary-hover: #42a5f5;
+      --text-light: #eef2ff;
+      --text-dim: #9aa9bb;
+      --text-muted: #5f6c80;
+    }
+
     body {
-      font-family: "Space Grotesk", sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-light);
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.5;
       scroll-behavior: smooth;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* Grid background */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Mouse glow (spotlight) */
+    #mouse-glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(30, 136, 229, 0.2) 0%, rgba(30, 136, 229, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.05s linear;
+      filter: blur(40px);
+      opacity: 0.7;
+    }
+
+    /* Container and layout */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 32px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Navigation */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      background: rgba(10, 12, 16, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.3px;
+      background: linear-gradient(120deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn-outline {
+      border: 1px solid var(--primary);
+      padding: 8px 20px;
+      border-radius: 30px;
+      background: transparent;
+      color: var(--primary);
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: rgba(30, 136, 229, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(30, 136, 229, 0.3);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: 500;
+      color: var(--text-dim);
+      transition: 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      padding: 80px 0 60px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(30, 136, 229, 0.12);
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--primary);
+      margin-bottom: 24px;
+      border: 1px solid rgba(30, 136, 229, 0.3);
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      max-width: 90%;
+    }
+
+    .hero-card {
+      background: #0f1117;
+      border-radius: 24px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+    }
+
+    .term-header {
+      background: #0a0c12;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 8px;
+    }
+
+    .term-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .term-body {
+      padding: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    /* Section headers */
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-header .overline {
+      color: var(--primary);
+      font-weight: 600;
+      letter-spacing: 2px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+    }
+
+    /* Skills & Cards with glow-on-hover (from behind) */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .skill-card,
+    .project-card,
+    .cert-card,
+    .thesis-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Glow effect that comes from behind on hover */
+    .skill-card::before,
+    .project-card::before,
+    .cert-card::before,
+    .thesis-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--primary-glow) 0%, transparent 80%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: -1;
+      border-radius: inherit;
+    }
+
+    .skill-card:hover::before,
+    .project-card:hover::before,
+    .cert-card:hover::before,
+    .thesis-card:hover::before {
+      opacity: 1;
+    }
+
+    .skill-card:hover,
+    .project-card:hover,
+    .cert-card:hover,
+    .thesis-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .skill-icon {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+
+    .skill-cat {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .skill-tag {
+      background: rgba(30, 136, 229, 0.1);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--primary);
+      opacity: 0.4;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 42px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -28px;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    .tl-period {
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .tl-role {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 6px 0 4px;
+    }
+
+    /* Projects grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .project-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .project-img {
+      height: 180px;
+      background: #0a0c16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--primary);
+    }
+
+    .project-content {
+      padding: 22px;
+    }
+
+    .project-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .project-tag {
+      background: rgba(30, 136, 229, 0.12);
+      border-radius: 30px;
+      font-size: 0.65rem;
+      padding: 4px 10px;
+    }
+
+    /* Certs */
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .cert-card {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .cert-icon {
+      font-size: 2rem;
+    }
+
+    .cert-info {
+      flex: 1;
+    }
+
+    .cert-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .qr-link {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .qr-code-img {
+      width: 32px;
+      height: 32px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    /* Thesis */
+    .thesis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin: 40px 0;
+    }
+
+    .thesis-card {
+      padding: 28px;
+    }
+
+    .thesis-version {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Contact */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      margin-top: 20px;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px 18px;
+      color: white;
+      margin-top: 8px;
+      margin-bottom: 20px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 40px 32px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .thesis-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 0 20px;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
     }
   </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
-  <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-    <div class="layout-container flex h-full grow flex-col">
-      <!-- Top Navigation Bar -->
-      <header
-        class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 md:px-20 py-4 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-50">
-        <div class="flex items-center gap-3 text-primary">
-          <span class="material-symbols-outlined text-3xl">memory</span>
-          <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">JULFIKER IBN
-            HAIDER</h2>
+<body>
+
+  <!-- Mouse glow element -->
+  <div id="mouse-glow"></div>
+
+  <nav>
+    <div class="logo"><i class="fas fa-microchip" style="color: var(--primary); margin-right: 8px;"></i> JULFIKER IBN
+      HAIDER</div>
+    <div class="nav-links">
+      <a href="#skills">Skills</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#education">Education</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <!-- Hero Section -->
+      <div class="hero">
+        <div>
+          <div class="hero-badge"><i class="fas fa-bolt"></i> Available for opportunities</div>
+          <h1>Building the bridge between <span>silicon</span> and <span>cloud</span></h1>
+          <p class="hero-desc">Mechatronics & Industrial Engineering graduate from CUET, Implementation Lead & Hardware
+            Designer at Southern IoT. I architect intelligent systems — from LoRaWAN industrial networks to real-time
+            energy monitoring.</p>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <a href="#projects" class="btn-primary"><i class="fas fa-arrow-right"></i> Explore work</a>
+            <a href="My_CV.pdf" class="btn-secondary" target="_blank"><i class="fas fa-file-pdf"></i> Resume</a>
+            <a href="#contact" class="btn-secondary">Let's talk</a>
+          </div>
         </div>
-        <div class="flex flex-1 justify-end gap-8 items-center">
-          <nav class="hidden md:flex items-center gap-8">
-            <a class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors text-sm font-medium"
-              href="#about">About</a>
-            <a class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors text-sm font-medium"
-              href="#skills">Skills</a>
-            <a class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors text-sm font-medium"
-              href="#projects">Projects</a>
-          </nav>
-          <a class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold transition-transform hover:scale-105 active:scale-95"
-            href="#contact">
-            Hire Me
+        <div class="hero-card">
+          <div class="term-header">
+            <div class="term-dot" style="background:#ff5f56;"></div>
+            <div class="term-dot" style="background:#ffbd2e;"></div>
+            <div class="term-dot" style="background:#27c93f;"></div>
+            <span style="margin-left: 8px; font-family: monospace; font-size: 0.7rem;">iot_engineer_profile</span>
+          </div>
+          <div class="term-body">
+            <span class="fas fa-angle-right" style="color:var(--primary);"></span> const engineer = {<br>
+            &nbsp;&nbsp;name: "Julfiker Ibn Haider",<br>
+            &nbsp;&nbsp;role: "Embedded & IoT Engineer",<br>
+            &nbsp;&nbsp;stack: ["ESP32", "LoRaWAN", "Modbus/RS485", "MQTT", "Home Assistant"],<br>
+            &nbsp;&nbsp;mission: "Build resilient edge-to-cloud systems"<br>
+            };<span
+              style="background: var(--primary); width: 8px; height: 12px; display: inline-block; margin-left: 4px;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills section -->
+      <section id="skills" style="margin: 60px 0;">
+        <div class="section-header">
+          <div class="overline">TECHNICAL CORE</div>
+          <h2>What I work with</h2>
+        </div>
+        <div class="skills-grid">
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-microchip"></i></div>
+            <div class="skill-cat">Microcontrollers</div>
+            <div class="skill-tags"><span class="skill-tag">ESP32/8266</span><span class="skill-tag">RP2350</span><span
+                class="skill-tag">RAK3172</span><span class="skill-tag">Arduino</span></div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-network-wired"></i></div>
+            <div class="skill-cat">Protocols</div>
+            <div class="skill-tags"><span class="skill-tag">LoRaWAN</span><span class="skill-tag">Modbus RTU</span><span
+                class="skill-tag">RS-485</span><span class="skill-tag">MQTT</span><span class="skill-tag">I2C/SPI</span>
+            </div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="skill-cat">IoT & Cloud</div>
+            <div class="skill-tags"><span class="skill-tag">Home Assistant</span><span
+                class="skill-tag">ESPHome</span><span class="skill-tag">Node-RED</span><span
+                class="skill-tag">InfluxDB/Grafana</span><span class="skill-tag">Docker</span></div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-drafting-compass"></i></div>
+            <div class="skill-cat">Hardware & Design</div>
+            <div class="skill-tags"><span class="skill-tag">PCB Design</span><span
+                class="skill-tag">SolidWorks</span><span class="skill-tag">CNC/GRBL</span><span class="skill-tag">Sensor
+                Fusion</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Experience -->
+      <section id="experience" style="margin: 60px 0;">
+        <div class="section-header">
+          <div class="overline">JOURNEY</div>
+          <h2>Professional experience</h2>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="tl-period">2025 – Present</div>
+            <div class="tl-role">Embedded Systems & IoT Engineer @ Southern IoT</div>
+            <div>Implementation Lead, designed IIoT energy monitors (RAK3172, LoRaWAN, Modbus), built CNC router & laser
+              machine, office Home Assistant automation, Aquanode V1 water monitor.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="tl-period">2022 – 2024</div>
+            <div class="tl-role">General Secretary @ Robo Mechatronics Association, CUET</div>
+            <div>Led flagship robotics competition, organized IoT workshops for 200+ students.</div>
+          </div>
+        </div>
+        <div style="margin-top: 32px; text-align: center;">
+          <a href="My_CV.pdf" class="btn-outline" target="_blank"><i class="fas fa-download"
+              style="margin-right: 8px;"></i> View Full Resume / CV</a>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section id="projects" style="margin: 60px 0;">
+        <div class="section-header">
+          <div class="overline">FEATURED BUILDS</div>
+          <h2>What I've built</h2>
+        </div>
+        <div class="projects-grid">
+          <a href="project-1.html" style="text-decoration: none; color: inherit;">
+            <div class="project-card" style="cursor: pointer;">
+              <div class="project-img" style="position: relative;">
+                <span style="position: absolute; top: 12px; left: 12px; background: rgba(30, 136, 229, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;">INDUSTRIAL IOT</span>
+                <img src="Project-1.png" alt="CareFlow V1" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="project-content">
+                <div class="project-title">Careflow V1 - Energy Monitoring System</div>
+                <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 12px;">Industrial IoT Energy Monitoring System using RAK3172 and LoRaWAN for reliable, long-range data transmission.</div>
+                <div class="project-tags"><span class="project-tag">Industrial</span><span class="project-tag">LoRaWAN</span><span class="project-tag">Modbus</span></div>
+              </div>
+            </div>
+          </a>
+          <a href="project-2.html" style="text-decoration: none; color: inherit;">
+            <div class="project-card" style="cursor: pointer;">
+              <div class="project-img" style="position: relative;">
+                <span style="position: absolute; top: 12px; left: 12px; background: rgba(30, 136, 229, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;">MANUFACTURING</span>
+                <img src="topscnc.png" alt="CNC Machine" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="project-content">
+                <div class="project-title">CNC Machine Build</div>
+                <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 12px;">Custom-built Computer Numerical Control (CNC) machine for precision manufacturing and fabrication tasks.</div>
+                <div class="project-tags"><span class="project-tag">Mechatronics</span><span class="project-tag">Hardware</span></div>
+              </div>
+            </div>
+          </a>
+          <a href="project-3.html" style="text-decoration: none; color: inherit;">
+            <div class="project-card" style="cursor: pointer;">
+              <div class="project-img" style="position: relative;">
+                <span style="position: absolute; top: 12px; left: 12px; background: rgba(30, 136, 229, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;">AUTOMATION</span>
+                <img src="wirebending.png" alt="Wire Bending Machine" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="project-content">
+                <div class="project-title">Wire Bending Machine</div>
+                <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 12px;">Automated wire bending machine facilitating rapid prototyping and manufacturing of custom wire forms.</div>
+                <div class="project-tags"><span class="project-tag">Mechatronics</span><span class="project-tag">Control Systems</span></div>
+              </div>
+            </div>
+          </a>
+          <a href="project-4.html" style="text-decoration: none; color: inherit;">
+            <div class="project-card" style="cursor: pointer;">
+              <div class="project-img" style="position: relative;">
+                <span style="position: absolute; top: 12px; left: 12px; background: rgba(30, 136, 229, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;">AQUANODE</span>
+                <img src="Aquanode.png" alt="Water Monitoring" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="project-content">
+                <div class="project-title">Water Monitoring System (Aquanode V1)</div>
+                <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 12px;">A project made for real time water monitoring and controlling the water level by controlling the pump in a precise way to make the system more efficient and reliable.</div>
+                <div class="project-tags"><span class="project-tag">ESP32</span><span class="project-tag">Sensors</span><span class="project-tag">Reality Storage</span><span class="project-tag">IoT</span></div>
+              </div>
+            </div>
+          </a>
+          <a href="project-5.html" style="text-decoration: none; color: inherit;">
+            <div class="project-card" style="cursor: pointer;">
+              <div class="project-img" style="position: relative;">
+                <span style="position: absolute; top: 12px; left: 12px; background: rgba(30, 136, 229, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;">AUTOMATION</span>
+                <img src="Home Assistant.png" alt="Home Automation" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="project-content">
+                <div class="project-title">Home Automation Project</div>
+                <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 12px;">IoT Based Home Automation system for real time controlling the Load connected to the house! Implemented at our Office area.</div>
+                <div class="project-tags"><span class="project-tag">IoT</span><span class="project-tag">Home Assistant</span><span class="project-tag">Relay Module</span><span class="project-tag">Operating System</span></div>
+              </div>
+            </div>
+          </a>
+          <a href="project-6.html" style="text-decoration: none; color: inherit;">
+            <div class="project-card" style="cursor: pointer;">
+              <div class="project-img" style="position: relative;">
+                <span style="position: absolute; top: 12px; left: 12px; background: rgba(30, 136, 229, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;">SETUP TESTING</span>
+                <img src="Current and Voltage testing unit.jpg" alt="Current and Voltage Monitoring" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="project-content">
+                <div class="project-title">Current and Voltage Monitoring System</div>
+                <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 12px;">IoT Based Current and Voltage Monitoring System for real time monitoring of current and voltage of the load connected to the terminal.</div>
+                <div class="project-tags"><span class="project-tag">ESP32</span><span class="project-tag">Sensors</span><span class="project-tag">OLED Screen</span></div>
+              </div>
+            </div>
+          </a>
+          <a href="#" style="text-decoration: none; color: inherit;">
+            <div class="project-card" style="cursor: pointer;">
+              <div class="project-img" style="position: relative; background: linear-gradient(135deg, #1e2a3a 0%, #0a0c16 100%);">
+                <span style="position: absolute; top: 12px; left: 12px; background: rgba(30, 136, 229, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px;">SYSTEM ANALYSIS</span>
+                <i class="fas fa-car-battery" style="font-size: 3rem; color: var(--primary);"></i>
+              </div>
+              <div class="project-content">
+                <div class="project-title">Portable Network-Connected Monitoring Device for EV Induction Motors Using ESP32 and Raspberry Pi with Multi-Sensor Data</div>
+                <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 12px;">This is the projec done by me as my thesis project. The project objectives was to make a portable device for monitoring the health of EV induction motors.</div>
+                <div class="project-tags"><span class="project-tag">ESP32</span><span class="project-tag">Sensors</span><span class="project-tag">OLED Screen</span></div>
+              </div>
+            </div>
           </a>
         </div>
-      </header>
-      <main class="flex flex-col flex-1 px-6 md:px-20 py-10 max-w-[1280px] mx-auto w-full">
-        <!-- Hero Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-10 md:py-20" id="about">
-          <div class="flex flex-col gap-6 order-2 lg:order-1">
-            <div
-              class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider w-fit">
-              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              Available
-            </div>
-            <h1 class="text-slate-900 dark:text-white text-4xl md:text-5xl font-black leading-tight tracking-tight">
-              Building the Bridge Between <span class="text-primary">Code</span> and <span
-                class="text-primary">Hardware</span>
-            </h1>
-            <p class="text-slate-600 dark:text-slate-400 text-lg md:text-xl leading-relaxed max-w-xl">
-              Mechatronics &amp; Industrial Engineering graduated from CUET, currently Embedded Systems &amp; IoT
-              Engineer at
-              Southern IoT.
-            </p>
-            <div class="flex flex-wrap gap-4">
-              <a class="flex min-w-[140px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-primary text-white text-base font-bold transition-all hover:shadow-lg hover:shadow-primary/20"
-                href="#projects">
-                View Projects
-              </a>
-              <a class="flex min-w-[140px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 border-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-base font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                href="#contact">
-                Get In Touch
-              </a>
-            </div>
-          </div>
-          <div class="order-1 lg:order-2">
-            <div class="relative group">
-              <div
-                class="absolute -inset-1 bg-gradient-to-r from-primary to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-1000">
-              </div>
-              <div
-                class="relative bg-slate-200 dark:bg-slate-800 aspect-square md:aspect-video rounded-xl overflow-hidden shadow-2xl">
-                <img class="w-full h-full object-cover" alt="Close-up of a high-tech printed circuit board"
-                  src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80" />
-              </div>
-            </div>
-          </div>
-        </section>
+      </section>
 
-        <!-- Technical Skills Section -->
-        <section class="py-16 border-t border-slate-200 dark:border-slate-800" id="skills">
-          <div class="mb-10">
-            <h2 class="text-slate-900 dark:text-white text-3xl font-bold mb-2">Technical Core</h2>
-            <p class="text-slate-600 dark:text-slate-400">Gathering mastery of the full embedded stack from silicon to
-              cloud. Still learning..</p>
+      <!-- Education + certifications -->
+      <section id="education" style="margin: 60px 0;">
+        <div class="section-header">
+          <div class="overline">ACADEMICS</div>
+          <h2>Education & credentials</h2>
+        </div>
+        <div class="skills-grid" style="margin-bottom: 40px;">
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-university"></i></div>
+            <div class="skill-cat">B.Sc. Mechatronics & Industrial Engineering</div>
+            <div>CUET, 2020–2025 | CGPA 3.10/4.00</div>
           </div>
-          <div class="flex gap-3 flex-wrap">
-            <!-- Skills -->
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">memory</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">ESP32/8266</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">cell_tower</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">LoRaWAN</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">cable</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">RS485/Modbus</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">developer_board</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">PCB Design</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">deployed_code</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">Docker</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">home_iot_device</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">Home Assistant</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">engineering</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">System Engineering</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">dns</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">Raspberry Pi</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">smart_toy</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">Robotics</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">precision_manufacturing</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">ROS</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">electrical_services</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">Electronics</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">precision_manufacturing</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">Mechatronics</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">settings</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">Mechanism</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-full bg-white dark:bg-slate-800 px-4 py-2 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary transition-all cursor-default group">
-              <span
-                class="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">architecture</span>
-              <span class="text-slate-700 dark:text-slate-200 text-sm font-medium">CNC</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Featured Projects Section -->
-        <section class="py-16 border-t border-slate-200 dark:border-slate-800" id="projects">
-          <div class="mb-10 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
-            <div>
-              <h2 class="text-slate-900 dark:text-white text-3xl font-bold mb-2">Featured Projects</h2>
-              <p class="text-slate-600 dark:text-slate-400">Integrated hardware and software solutions for learning and
-                industrial
-                challenges.</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Project 1 -->
-            <a href="project-1.html"
-              class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 overflow-hidden group hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-              <div
-                class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80"
-                  alt="Industrial IoT Energy Monitoring System" src="Project-1.png" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div
-                  class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">
-                  Industrial IoT</div>
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-2">Careflow V1 - Energy Monitoring System
-                </h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                  Industrial IoT Energy Monitoring System using RAK3172 and LoRaWAN for reliable, long-range data
-                  transmission.
-                </p>
-                <div class="flex flex-wrap gap-2 mt-auto">
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">RAK3172</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">LoRaWAN</span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 2 -->
-            <a href="project-2.html"
-              class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 overflow-hidden group hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-              <div
-                class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80"
-                  alt="CNC machine build" src="topscnc.png" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div
-                  class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">
-                  Manufacturing</div>
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-2">CNC Machine Build</h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                  Custom-built Computer Numerical Control (CNC) machine for precision manufacturing and fabrication
-                  tasks.
-                </p>
-                <div class="flex flex-wrap gap-2 mt-auto">
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Mechatronics</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Hardware</span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 3 -->
-            <a href="project-3.html"
-              class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 overflow-hidden group hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-              <div
-                class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80"
-                  alt="Wire bending machine" src="wirebending.png" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div
-                  class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">
-                  Automation</div>
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-2">Wire Bending Machine</h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                  Automated wire bending machine facilitating rapid prototyping and manufacturing of custom wire forms.
-                </p>
-                <div class="flex flex-wrap gap-2 mt-auto">
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Mechatronics</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Control
-                    Systems</span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 4 -->
-            <a href="project-4.html"
-              class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 overflow-hidden group hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-              <div
-                class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80"
-                  alt="Modular sensor testing station" src="Aquanode.png" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div
-                  class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">
-                  IOT</div>
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-2">Water Monitoring System (Aquanode V1)
-                </h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                  A project made for real time water monitoring and controlling the water level by controlling the pump
-                  in a
-                  precise way to make the system more efficient and reliable.
-                </p>
-                <div class="flex flex-wrap gap-2 mt-auto">
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">ESP32</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Sensors</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Relay Module</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">IOT</span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 5 -->
-            <a href="project-5.html"
-              class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 overflow-hidden group hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-              <div
-                class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80"
-                  alt="Bench oscilloscope/voltmeter" src="Home Assistant.png" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div
-                  class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">
-                  Automation</div>
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-2">Home Automation Project</h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                  IOT Based Home Automation system for real time controlling the Load connected to the house!
-                  Implemented at our Office area.
-                </p>
-                <div class="flex flex-wrap gap-2 mt-auto">
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">ESP32</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Home Assistant</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Relay Module</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">IOT</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Networking</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Operating
-                    System</span>
-                </div>
-              </div>
-            </a>
-            <!-- Project 6-->
-            <a href="project-6.html"
-              class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 overflow-hidden group hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-              <div
-                class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80"
-                  alt="Industrial IoT Energy Monitoring System" src="Current and Voltage testing unit.jpg" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div
-                  class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">
-                  Setup Testing</div>
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-2">Current and Voltage Monitoring System
-                </h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                  IOT Based Current and Voltage Monitoring system for real time monitoring of current and voltage of the
-                  load connected to the terminal.
-                </p>
-                <div class="flex flex-wrap gap-2 mt-auto">
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">ESP32</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Sensors</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">OLED Screen</span>
-                </div>
-              </div>
-            </a>
-            <!-- Project 7-->
-            <a href="project-7.html"
-              class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 overflow-hidden group hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-              <div
-                class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80"
-                  alt="Industrial IoT Energy Monitoring System" src="Current and Voltage testing unit.jpg" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div
-                  class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">
-                  System Analysis</div>
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-2">Portable Network-Connected Monitoring
-                  Device for EV Induction Motors Using ESP32 and Raspberry Pi with Multi-Sensor Data
-                </h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                  This is the projec done by me as my thesis project. The project objectives was to make a system which
-                  will help to make and EV more efficient and more safe
-                </p>
-                <div class="flex flex-wrap gap-2 mt-auto">
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">ESP32</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Raspberry pi</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">IOT</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Sensors</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Dashboard</span>
-                  <span class="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded">Linux</span>
-                </div>
-              </div>
-            </a>
-
-          </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section class="py-16 border-t border-slate-200 dark:border-slate-800" id="contact">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div>
-              <h2 class="text-slate-900 dark:text-white text-4xl font-bold mb-6">Let's Connect</h2>
-              <p class="text-slate-600 dark:text-slate-400 text-lg mb-8">
-                Looking for an engineer to architect your next connected device? Connect with me via Email or LinkedIn.
-              </p>
-              <div class="flex flex-col gap-4">
-                <a href="mailto:example@linkedin.com"
-                  class="flex items-center gap-4 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors w-fit">
-                  <span class="material-symbols-outlined text-primary">mail</span>
-                  <span class="font-medium">Send me an email</span>
-                </a>
-                <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer"
-                  class="flex items-center gap-4 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors w-fit">
-                  <span class="material-symbols-outlined text-primary">link</span>
-                  <span class="font-medium">Connect on LinkedIn</span>
-                </a>
-              </div>
-            </div>
-            <div
-              class="bg-slate-100 dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
-              <form class="flex flex-col gap-6 w-full">
-                <div class="flex flex-col gap-2">
-                  <label class="text-sm font-bold text-slate-900 dark:text-white">Full Name</label>
-                  <input
-                    class="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-slate-900 dark:text-white w-full"
-                    placeholder="John Doe" type="text" />
-                </div>
-                <div class="flex flex-col gap-2">
-                  <label class="text-sm font-bold text-slate-900 dark:text-white">Email Address</label>
-                  <input
-                    class="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-slate-900 dark:text-white w-full"
-                    placeholder="john@example.com" type="email" />
-                </div>
-                <div class="flex flex-col gap-2">
-                  <label class="text-sm font-bold text-slate-900 dark:text-white">Message</label>
-                  <textarea
-                    class="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-slate-900 dark:text-white w-full"
-                    placeholder="Tell me about your project..." rows="4"></textarea>
-                </div>
-                <button
-                  class="bg-primary text-white font-bold py-4 rounded-lg transition-all hover:bg-primary/90 w-full"
-                  type="submit">Send Message</button>
-              </form>
-            </div>
-          </div>
-        </section>
-      </main>
-      <!-- Footer -->
-      <footer
-        class="border-t border-slate-200 dark:border-slate-800 py-10 px-6 md:px-20 bg-slate-50 dark:bg-background-dark">
-        <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div class="flex items-center gap-3 text-primary">
-            <span class="material-symbols-outlined">memory</span>
-            <span class="text-slate-900 dark:text-white font-bold">IoT Portfolio</span>
-          </div>
-          <div class="text-slate-500 dark:text-slate-400 text-sm text-center md:text-left">
-            © 2024 Julfiker Ibn Haider.
-          </div>
-          <div class="flex gap-6">
-            <a class="text-slate-400 hover:text-primary transition-colors" href="https://linkedin.com">
-              <span class="material-symbols-outlined">link</span>
-            </a>
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="skill-cat">Higher Secondary (HSC)</div>
+            <div>Tamirul Millat Kamil Madrasah | GPA 5.00</div>
           </div>
         </div>
-      </footer>
+
+        <!-- Certifications with QR & links -->
+        <div class="section-header">
+          <div class="overline">CERTIFICATIONS</div>
+          <h2>Continuous learning</h2>
+        </div>
+        <div class="certs-grid">
+          <div class="cert-card">
+            <div class="cert-icon"><i class="fas fa-cube"></i></div>
+            <div class="cert-info">
+              <div class="cert-name">SolidWorks 3D Creator Associate</div>
+              <div class="cert-issuer">SOLIDWORKS CAD Associate</div>
+              <div class="qr-link"><img class="qr-code-img"
+                  src="https://quickchart.io/qr?text=https://solidworks.com/verify/JH3D2024&size=80" alt="QR"><a
+                  href="https://solidworks.com/verify/JH3D2024" target="_blank">Verify credential ↗</a></div>
+            </div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-icon"><i class="fas fa-drafting-compass"></i></div>
+            <div class="cert-info">
+              <div class="cert-name">SolidWorks Mechanical Design Professional</div>
+              <div class="cert-issuer">SOLIDWORKS (CSWP)</div>
+              <div class="qr-link"><img class="qr-code-img"
+                  src="https://quickchart.io/qr?text=https://solidworks.com/verify/JHCSWP2025&size=80" alt="QR"><a
+                  href="https://solidworks.com/verify/JHCSWP2025" target="_blank">Verify credential ↗</a></div>
+            </div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-icon"><i class="fas fa-industry"></i></div>
+            <div class="cert-info">
+              <div class="cert-name">Industrial Automation (PLC/HMI)</div>
+              <div class="cert-issuer">IICT CUET & BCC | 60hrs TIA Portal</div>
+            </div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="cert-info">
+              <div class="cert-name">Basic Safety Training</div>
+              <div class="cert-issuer">Samsung C&T | First Aid, Fire Safety</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Undergraduate Thesis: two versions -->
+      <section style="margin: 60px 0;">
+        <div class="section-header">
+          <div class="overline">UNDERGRADUATE THESIS</div>
+          <h2>EV Induction Motor Health Monitor</h2>
+          <p style="color: var(--text-dim); max-width: 650px;">Portable network-connected device for EV motors:
+            multi-sensor data acquisition, MQTT, InfluxDB, Grafana dashboard.</p>
+        </div>
+        <div class="thesis-grid">
+          <div class="thesis-card">
+            <div class="thesis-version"><i class="fas fa-code-branch"></i> RUNNING CODEBASE (v2.0)</div>
+            <div class="project-title" style="margin: 12px 0 8px;">Production-ready firmware & dashboard</div>
+            <p>Optimized ESP32 firmware with deep sleep, OTA updates, and real-time anomaly detection. Full Grafana
+              stack deployed on Raspberry Pi 4. Modular sensor handling.</p>
+            <div class="qr-link" style="margin-top: 20px;"><a href="#" target="_blank"><i class="fab fa-github"></i>
+                github.com/ALifHaider19/ev-monitor-latest</a></div>
+          </div>
+          <div class="thesis-card">
+            <div class="thesis-version"><i class="fas fa-history"></i> PREVIOUS VERSION (v1.0)</div>
+            <div class="project-title" style="margin: 12px 0 8px;">Legacy prototype & proof-of-concept</div>
+            <p>Initial thesis prototype: basic sensor logging, local Node-RED interface, PCB design files. Foundation
+              for the advanced monitoring architecture.</p>
+            <div class="qr-link" style="margin-top: 20px;"><a href="#" target="_blank"><i class="fab fa-github"></i>
+                github.com/ALifHaider19/ev-monitor-legacy</a></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" style="margin: 60px 0 80px;">
+        <div class="section-header">
+          <div class="overline">CONNECT</div>
+          <h2>Let's build something smart</h2>
+        </div>
+        <div class="contact-grid">
+          <div>
+            <p style="margin-bottom: 24px;">Looking for an embedded engineer to architect your next IoT product? Reach
+              out.</p>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div><i class="fas fa-envelope" style="color:var(--primary); width: 30px;"></i> haideralif123@gmail.com
+              </div>
+              <div><i class="fas fa-phone-alt"></i> +880 1835 488814</div>
+              <div><i class="fab fa-github"></i> github.com/ALifHaider19</div>
+              <div><i class="fab fa-linkedin"></i> linkedin.com/in/julfiker-iot</div>
+            </div>
+          </div>
+          <div class="contact-form">
+            <input type="text" placeholder="Full name">
+            <input type="email" placeholder="Email address">
+            <textarea rows="4" placeholder="Tell me about your project..."></textarea>
+            <button class="btn-primary" style="width: 100%; justify-content: center;">Send message <i
+                class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </section>
     </div>
-  </div>
+  </main>
+
+  <footer>
+    <div>© 2025 Julfiker Ibn Haider — Embedded & IoT Engineer | Kabirhat, Noakhali, Bangladesh</div>
+    <div style="margin-top: 16px;"><a href="#" style="color: var(--text-muted); margin: 0 12px;">GitHub</a> <a href="#"
+        style="color: var(--text-muted); margin: 0 12px;">LinkedIn</a> <a href="My_CV.pdf"
+        style="color: var(--text-muted);">Resume</a></div>
+  </footer>
+
+  <script>
+    // Mouse glow effect (short glow that follows cursor)
+    const mouseGlow = document.getElementById('mouse-glow');
+    document.addEventListener('mousemove', (e) => {
+      mouseGlow.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+    });
+
+    // For hover cards: dynamically set radial gradient origin based on mouse position inside card (optional)
+    const cards = document.querySelectorAll('.skill-card, .project-card, .cert-card, .thesis-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--mouse-x', `${x}%`);
+        card.style.setProperty('--mouse-y', `${y}%`);
+      });
+    });
+
+    // Intersection Observer for fade-up animation
+    const animatedElements = document.querySelectorAll('.skill-card, .project-card, .timeline-item, .cert-card, .thesis-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+    animatedElements.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
+  </script>
 </body>
 
 </html>
+```
