@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EV Motor Health Monitoring — B.Sc. Thesis | Julfiker Ibn Haider</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-void:      #050507;
+    --bg-base:      #090a0f;
+    --bg-surface:   rgba(255,255,255,0.035);
+    --bg-hover:     rgba(255,255,255,0.055);
+    --border:       rgba(255,255,255,0.07);
+    --border-glow:  rgba(245,158,11,0.25);
+    --amber:        #f59e0b;
+    --amber-dim:    #d97706;
+    --teal:         #2dd4bf;
+    --teal-dim:     #0d9488;
+    --red:          #f87171;
+    --green:        #4ade80;
+    --blue:         #60a5fa;
+    --purple:       #a78bfa;
+    --text-primary: #f1f5f9;
+    --text-secondary:#94a3b8;
+    --text-muted:   #475569;
+    --mono:         'IBM Plex Mono', monospace;
+    --sans:         'IBM Plex Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Background texture ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(245,158,11,0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(45,212,191,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(16px, 5vw, 64px);
+    height: 60px;
+    background: rgba(5,5,7,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .nav-logo .hex {
+    color: var(--amber);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .nav-links {
+    display: flex; gap: 28px; list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--amber); }
+
+  /* ── PAGE WRAPPER ── */
+  .page {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 clamp(16px, 5vw, 48px) 80px;
+  }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb {
+    display: flex; align-items: center; gap: 8px;
+    padding: 20px 0 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  .breadcrumb a {
+    color: var(--amber);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .breadcrumb a:hover { color: var(--amber-dim); }
+  .breadcrumb span { color: var(--text-muted); }
+
+  /* ── HERO ── */
+  .hero { padding: 32px 0 40px; }
+
+  .badge-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 20px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .badge-thesis  { background: rgba(167,139,250,0.15); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+  .badge-cuet    { background: rgba(245,158,11,0.12);  color: var(--amber);  border: 1px solid rgba(245,158,11,0.25); }
+  .badge-ml      { background: rgba(96,165,250,0.12);  color: var(--blue);   border: 1px solid rgba(96,165,250,0.25); }
+  .badge-pulse::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+  .hero h1 {
+    font-size: clamp(26px, 5vw, 44px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    max-width: 750px;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin-bottom: 28px;
+    line-height: 1.8;
+  }
+
+  .tech-tags {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 32px;
+  }
+  .tag {
+    padding: 4px 10px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .tag:hover { border-color: var(--amber); color: var(--amber); }
+
+  /* ── PDF DOWNLOAD BTN ── */
+  .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 36px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--amber);
+    color: #000;
+  }
+  .btn-primary:hover { background: var(--amber-dim); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--amber); color: var(--amber); transform: translateY(-1px); }
+
+  /* ── STATS GRID ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 16px;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border-glow); }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .stat-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* ── INFO CARD ── */
+  .info-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .info-card .icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .info-card .content {}
+  .info-card .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .info-card .value {
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+  .info-card .sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-top: 64px; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .section-desc {
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin-bottom: 28px;
+    font-size: 14px;
+  }
+
+  /* ── ARCH CARDS ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 16px;
+  }
+  .arch-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 20px;
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .arch-card:hover {
+    border-color: var(--border-glow);
+    background: var(--bg-hover);
+  }
+  .arch-icon { font-size: 26px; margin-bottom: 12px; }
+  .arch-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+  .arch-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .arch-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    background: rgba(245,158,11,0.1);
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  /* ── DATA FLOW ── */
+  .flow-wrap {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 700px;
+    padding: 28px 0;
+  }
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 110px;
+  }
+  .flow-box {
+    width: 96px;
+    padding: 12px 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .flow-box:hover { border-color: var(--amber); }
+  .flow-box .ficon { font-size: 22px; margin-bottom: 4px; }
+  .flow-box .fname {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .flow-box .fsub {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+  .flow-arrow {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--amber);
+  }
+  .flow-proto {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  /* ── SENSOR TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+  tbody tr:hover td { background: var(--bg-surface); }
+  .td-mono { font-family: var(--mono); color: var(--teal); }
+  .td-unit { color: var(--amber); }
+
+  /* ── ML MODEL CARDS ── */
+  .ml-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .ml-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .ml-card:hover { border-color: var(--border-glow); }
+  .ml-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .ml-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+  .ml-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .ml-bar {
+    margin-top: 12px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .ml-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--amber), var(--teal)); }
+
+  /* ── RESULTS ── */
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .result-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .result-metric {
+    font-family: var(--mono);
+    font-size: 30px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--amber), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .result-card .label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .result-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item {
+    display: grid;
+    grid-template-columns: 160px 40px 1fr;
+    gap: 0;
+    align-items: start;
+  }
+  .tl-phase {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 20px 0 0;
+    text-align: right;
+    padding-right: 20px;
+  }
+  .tl-phase.done   { color: var(--green); }
+  .tl-phase.active { color: var(--amber); }
+  .tl-phase.future { color: var(--text-muted); }
+
+  .tl-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .tl-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    margin-top: 22px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .tl-dot.done   { background: var(--green); box-shadow: 0 0 8px rgba(74,222,128,0.5); }
+  .tl-dot.active { background: var(--amber); box-shadow: 0 0 12px rgba(245,158,11,0.6); animation: tl-pulse 2s ease-in-out infinite; }
+  .tl-dot.future { background: var(--text-muted); }
+  @keyframes tl-pulse { 0%,100%{box-shadow:0 0 12px rgba(245,158,11,.6)} 50%{box-shadow:0 0 20px rgba(245,158,11,.9)} }
+
+  .tl-track {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    margin-left: -1px;
+    min-height: 20px;
+  }
+  .tl-item:last-child .tl-track { display: none; }
+
+  .tl-content {
+    padding: 16px 0 24px 20px;
+    border-left: 0;
+  }
+  .tl-content h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .tl-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+
+  /* ── ABSTRACT BOX ── */
+  .abstract-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--purple);
+    border-radius: 8px;
+    padding: 24px 24px;
+  }
+  .abstract-box .abs-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--purple);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .abstract-box p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  /* ── SUPERVISOR CARD ── */
+  .supervisor-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .sup-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(167,139,250,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    border: 1px solid rgba(167,139,250,0.3);
+  }
+  .sup-name { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .sup-role { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+
+  /* ── FIRMWARE COLS ── */
+  .reg-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .reg-section {}
+  .reg-section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .reg-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .reg-entry:last-child { border-bottom: 0; }
+  .reg-addr {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--teal);
+    min-width: 52px;
+  }
+  .reg-name { font-family: var(--mono); font-size: 11px; color: var(--text-primary); flex: 1; }
+  .reg-type { font-family: var(--mono); font-size: 9px; color: var(--text-muted); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    margin-top: 80px;
+    padding: 24px clamp(16px, 5vw, 64px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .tl-item { grid-template-columns: 90px 32px 1fr; }
+    .tl-phase { font-size: 8px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <a class="nav-logo" href="https://julfikerhaider2001.github.io/portfolio.alif/index.html">
+    <span class="hex">⬡</span>JULFIKER IBN HAIDER
+  </a>
+  <ul class="nav-links">
+    <li><a href="https://julfikerhaider2001.github.io/portfolio.alif/index.html#about">About</a></li>
+    <li><a href="https://julfikerhaider2001.github.io/portfolio.alif/index.html#skills">Skills</a></li>
+    <li><a href="https://julfikerhaider2001.github.io/portfolio.alif/index.html#projects">Projects</a></li>
+    <li><a href="https://julfikerhaider2001.github.io/portfolio.alif/My_CV.pdf">Resume</a></li>
+    <li><a href="https://julfikerhaider2001.github.io/portfolio.alif/index.html#contact">Hire Me</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+  <!-- ═══════════════ BREADCRUMB ═══════════════ -->
+  <div class="breadcrumb">
+    <a href="https://julfikerhaider2001.github.io/portfolio.alif/index.html">← Back to Portfolio</a>
+    <span>|</span>
+    <span>Projects</span>
+    <span>›</span>
+    <span>Embedded Systems &amp; ML</span>
+    <span>›</span>
+    <span>EV Motor Health Monitor</span>
+  </div>
+
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <section class="hero">
+    <div class="badge-row">
+      <span class="badge badge-thesis">B.Sc. Thesis · CUET</span>
+      <span class="badge badge-cuet">Mechatronics &amp; Industrial Engineering</span>
+      <span class="badge badge-ml badge-pulse">ML-POWERED</span>
+    </div>
+
+    <h1>EV Motor Fault Detection &amp; Predictive Health Monitoring</h1>
+
+    <p class="hero-sub">
+      A machine learning–based predictive maintenance system for electric vehicle motors.
+      Multi-sensor real-time data acquisition via ESP32, processed on Raspberry Pi 4 with
+      LSTM, Random Forest and CNN classifiers — visualised through InfluxDB + Grafana dashboards.
+    </p>
+
+    <div class="tech-tags">
+      <span class="tag">Raspberry Pi 4</span>
+      <span class="tag">ESP32</span>
+      <span class="tag">DS18B20</span>
+      <span class="tag">MPU-6050</span>
+      <span class="tag">ACS712</span>
+      <span class="tag">NK200 RPM Sensor</span>
+      <span class="tag">InfluxDB</span>
+      <span class="tag">Grafana</span>
+      <span class="tag">Python Flask</span>
+      <span class="tag">LSTM</span>
+      <span class="tag">Random Forest</span>
+      <span class="tag">CNN</span>
+      <span class="tag">FreeRTOS</span>
+      <span class="tag">I2C · UART · Wi-Fi</span>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" href="Final_thesis.pdf" download="EV_Motor_Health_Monitor_Thesis_JulfikerIbnHaider.pdf">
+        📄 Download Thesis PDF
+      </a>
+      <a class="btn btn-outline" href="#architecture">🔩 System Architecture</a>
+      <a class="btn btn-outline" href="#timeline">📋 Timeline</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Sensors</div>
+        <div class="stat-value">5</div>
+        <div class="stat-desc">Multi-parameter array</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">ML Models</div>
+        <div class="stat-value">3</div>
+        <div class="stat-desc">LSTM · RF · CNN</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Latency</div>
+        <div class="stat-value">100ms</div>
+        <div class="stat-desc">Real-time inference</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Parameters</div>
+        <div class="stat-value">8+</div>
+        <div class="stat-desc">Monitored channels</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Platform</div>
+        <div class="stat-value">RPi 4</div>
+        <div class="stat-desc">4GB · Quad-core</div>
+      </div>
+    </div>
+
+    <!-- Info row -->
+    <div style="margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;">
+      <div class="info-card">
+        <div class="icon">🎓</div>
+        <div class="content">
+          <div class="label">Institution</div>
+          <div class="value">Chittagong University of Engineering &amp; Technology</div>
+          <div class="sub">Department of Mechatronics &amp; Industrial Engineering</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="icon">📡</div>
+        <div class="content">
+          <div class="label">Connectivity</div>
+          <div class="value">ESP32 Wi-Fi → InfluxDB HTTP push</div>
+          <div class="sub">Push interval: every 3 seconds · OLED live display</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ ABSTRACT ═══════════════ -->
+  <section class="section">
+    <div class="section-label">Abstract</div>
+    <div class="abstract-box">
+      <div class="abs-label">Research Summary</div>
+      <p>
+        The rapid rise of electric vehicles (EVs) underscores the need for reliable systems to monitor
+        critical components like electric motors. This thesis proposes a novel predictive health monitoring
+        system integrating the computational power of the Raspberry Pi 4, the versatility of the ESP32
+        microcontroller, and a multi-sensor array — collecting real-time data on motor temperature,
+        vibration, RPM, current and voltage. Machine learning algorithms including Random Forest, LSTM
+        networks, and CNNs analyse this data to detect anomalies, classify motor conditions, and predict
+        maintenance needs. The system is validated through real-world sensor data collection and Grafana
+        visualisation, contributing to cost-effective predictive maintenance for sustainable EV technology.
+      </p>
+    </div>
+
+    <!-- Supervisor -->
+    <div class="supervisor-card">
+      <div class="sup-icon">👨‍🏫</div>
+      <div>
+        <div class="sup-name">Monowar Wadud Hridoy</div>
+        <div class="sup-role">Supervisor · Assistant Professor · Dept. of Mechatronics &amp; Industrial Engineering · CUET</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ ARCHITECTURE ═══════════════ -->
+  <section class="section" id="architecture">
+    <div class="section-label">Technical Architecture</div>
+    <h2 class="section-title">System Design</h2>
+    <p class="section-desc">
+      Every layer engineered for real-time fault awareness — from the sensor bus to the ML inference pipeline.
+    </p>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="arch-icon">🍓</div>
+        <h3>Raspberry Pi 4 (4GB)</h3>
+        <p>Central processing unit running Raspbian OS with Python-based ML inference, Flask web UI, and real-time data pipeline management.</p>
+        <span class="arch-tag">Quad-core · 4GB RAM · Python ML</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">⚡</div>
+        <h3>ESP32 Microcontroller</h3>
+        <p>Handles all low-level sensor interfacing over I2C/SPI/ADC. Dual-core 240MHz with on-board Wi-Fi for HTTP push to InfluxDB every 3 seconds.</p>
+        <span class="arch-tag">FreeRTOS · 240MHz · Wi-Fi</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">🌡️</div>
+        <h3>DS18B20 Temperature</h3>
+        <p>1-Wire digital temperature sensor with ±0.5°C precision, detecting motor overheating conditions in real time.</p>
+        <span class="arch-tag">1-Wire · ±0.5°C · Waterproof</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">📐</div>
+        <h3>MPU-6050 IMU</h3>
+        <p>6-axis accelerometer + gyroscope for vibration and orientation monitoring. Identifies mechanical faults like bearing wear or motor misalignment via I2C.</p>
+        <span class="arch-tag">I2C · 6-DoF · 3-axis Gyro</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">🔌</div>
+        <h3>ACS712 Current &amp; Voltage</h3>
+        <p>Hall-effect current sensor (30A range) alongside a voltage divider circuit. Tracks electrical anomalies — overcurrent, voltage sag and short-circuit events.</p>
+        <span class="arch-tag">ADC · RMS · Hall-Effect</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">🔄</div>
+        <h3>NK200 / Hall RPM Sensor</h3>
+        <p>Optical pulse counter with interrupt-driven RPM calculation at ~20Hz resolution. Hall effect backup for validation.</p>
+        <span class="arch-tag">20 pulses/rev · ISR · 50ms</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">🗄️</div>
+        <h3>InfluxDB Time-Series DB</h3>
+        <p>High write-throughput time-series database on Raspberry Pi. Stores voltage, current, RPM, temperature and gyro streams with nanosecond timestamps.</p>
+        <span class="arch-tag">HTTP / MQTT · Push every 3s</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">📊</div>
+        <h3>Grafana Dashboard</h3>
+        <p>Real-time gauge charts and time-series graphs for all motor parameters. Threshold-based alerts for fault conditions. Directly queries InfluxDB.</p>
+        <span class="arch-tag">Gauge · Time-series · Alerts</span>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">🤖</div>
+        <h3>ML Inference Engine</h3>
+        <p>Python scikit-learn pipeline on RPi 4 — Random Forest for fault classification, LSTM for temporal anomaly detection, CNN for vibration pattern recognition.</p>
+        <span class="arch-tag">scikit-learn · TensorFlow · Flask</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ DATA FLOW ═══════════════ -->
+  <section class="section">
+    <div class="section-label">Data Flow</div>
+    <h2 class="section-title">End-to-End Pipeline</h2>
+
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="flow-node">
+          <div class="flow-box">
+            <div class="ficon">🔌</div>
+            <div class="fname">Sensors</div>
+            <div class="fsub">DS18B20 · MPU · ACS</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-arrow">→</div>
+          <div class="flow-proto">I2C / ADC</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box">
+            <div class="ficon">⚡</div>
+            <div class="fname">ESP32</div>
+            <div class="fsub">MCU Core</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-arrow">→</div>
+          <div class="flow-proto">HTTP Wi-Fi</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box">
+            <div class="ficon">🗄️</div>
+            <div class="fname">InfluxDB</div>
+            <div class="fsub">Time-Series</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-arrow">→</div>
+          <div class="flow-proto">Query API</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box">
+            <div class="ficon">📊</div>
+            <div class="fname">Grafana</div>
+            <div class="fsub">Dashboard</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-arrow">→</div>
+          <div class="flow-proto">CSV Dataset</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box">
+            <div class="ficon">🤖</div>
+            <div class="fname">ML Model</div>
+            <div class="fsub">RPi 4 · Python</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-arrow">→</div>
+          <div class="flow-proto">Flask API</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box">
+            <div class="ficon">🚨</div>
+            <div class="fname">Fault Alert</div>
+            <div class="fsub">OLED · Web UI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ SENSOR DATA TABLE ═══════════════ -->
+  <section class="section">
+    <div class="section-label">Monitored Parameters</div>
+    <h2 class="section-title">Real-Time Sensor Channels</h2>
+    <p class="section-desc">
+      All parameters collected at 50–100ms polling intervals and pushed to InfluxDB every 3 seconds.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Sensor</th>
+            <th>Interface</th>
+            <th>Unit</th>
+            <th>Range</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-mono">temperature</td>
+            <td>DS18B20</td>
+            <td class="td-unit">1-Wire</td>
+            <td class="td-unit">°C</td>
+            <td>−55 to +125</td>
+            <td>Motor winding / ambient temperature</td>
+          </tr>
+          <tr>
+            <td class="td-mono">current</td>
+            <td>ACS712 30A</td>
+            <td class="td-unit">ADC RMS</td>
+            <td class="td-unit">A</td>
+            <td>0 – 30 A</td>
+            <td>Phase RMS current, calibrated with 5s zero-offset</td>
+          </tr>
+          <tr>
+            <td class="td-mono">voltage</td>
+            <td>Voltage Divider</td>
+            <td class="td-unit">ADC</td>
+            <td class="td-unit">V</td>
+            <td>0 – 25 V</td>
+            <td>Motor supply voltage (12V nominal)</td>
+          </tr>
+          <tr>
+            <td class="td-mono">rpm</td>
+            <td>NK200 / Hall</td>
+            <td class="td-unit">ISR Counter</td>
+            <td class="td-unit">RPM</td>
+            <td>0 – 5000</td>
+            <td>Motor shaft speed, 20 pulses/revolution</td>
+          </tr>
+          <tr>
+            <td class="td-mono">gyro_x / y / z</td>
+            <td>MPU-6050</td>
+            <td class="td-unit">I2C</td>
+            <td class="td-unit">rad/s</td>
+            <td>±250 dps</td>
+            <td>Vibration &amp; angular velocity — fall / imbalance detection</td>
+          </tr>
+          <tr>
+            <td class="td-mono">accel_x / y / z</td>
+            <td>MPU-6050</td>
+            <td class="td-unit">I2C</td>
+            <td class="td-unit">m/s²</td>
+            <td>±8 g</td>
+            <td>Mechanical vibration signature analysis</td>
+          </tr>
+          <tr>
+            <td class="td-mono">rssi</td>
+            <td>ESP32 Wi-Fi</td>
+            <td class="td-unit">Internal</td>
+            <td class="td-unit">dBm</td>
+            <td>−90 to −30</td>
+            <td>Wireless signal quality monitoring</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ ML MODELS ═══════════════ -->
+  <section class="section">
+    <div class="section-label">Machine Learning</div>
+    <h2 class="section-title">Fault Classification Models</h2>
+    <p class="section-desc">
+      Three complementary algorithms trained on the collected motor dataset to cover temporal, spatial and pattern-based fault signatures.
+    </p>
+
+    <div class="ml-grid">
+      <div class="ml-card">
+        <div class="ml-num">01</div>
+        <h3>Random Forest</h3>
+        <p>Ensemble classifier for tabular sensor readings. Robust to noisy ADC data, handles feature importance ranking across current, temperature and RPM channels.</p>
+        <div class="ml-bar"><div class="ml-bar-fill" style="width:88%"></div></div>
+      </div>
+      <div class="ml-card">
+        <div class="ml-num">02</div>
+        <h3>LSTM Network</h3>
+        <p>Recurrent neural network targeting sequential temporal patterns in motor data. Ideal for catching gradual degradation and early-stage fault trends over time windows.</p>
+        <div class="ml-bar"><div class="ml-bar-fill" style="width:82%"></div></div>
+      </div>
+      <div class="ml-card">
+        <div class="ml-num">03</div>
+        <h3>1D-CNN</h3>
+        <p>Convolutional neural network applied to vibration time-series. Extracts local spatial patterns from MPU-6050 gyro streams to detect bearing wear and imbalance.</p>
+        <div class="ml-bar"><div class="ml-bar-fill" style="width:85%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ RESULTS ═══════════════ -->
+  <section class="section">
+    <div class="section-label">Results &amp; Analysis</div>
+    <h2 class="section-title">System Outcomes</h2>
+    <p class="section-desc">Key performance metrics from sensor data collection, data pipeline validation and initial ML model evaluation.</p>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="label">Inference Latency</div>
+        <div class="result-metric">100ms</div>
+        <p>Real-time fault prediction on Raspberry Pi 4 within 100ms of data arrival</p>
+      </div>
+      <div class="result-card">
+        <div class="label">Data Push Rate</div>
+        <div class="result-metric">3s</div>
+        <p>All 8 sensor fields pushed to InfluxDB every 3 seconds via HTTP</p>
+      </div>
+      <div class="result-card">
+        <div class="label">Sensor Accuracy</div>
+        <div class="result-metric">±0.5°C</div>
+        <p>DS18B20 temperature precision; current sensor calibrated with 5s zero-offset</p>
+      </div>
+      <div class="result-card">
+        <div class="label">Dataset Collected</div>
+        <div class="result-metric">MY_EV</div>
+        <p>Real sensor dataset (CSV) capturing Current, Voltage, RPM, Temperature correlations</p>
+      </div>
+    </div>
+
+    <!-- Key correlations found -->
+    <div style="margin-top:20px; background:var(--bg-surface); border:1px solid var(--border); border-radius:10px; padding:22px;">
+      <div class="section-label" style="margin-bottom:12px;">Key Findings — Sensor Correlations</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:4px;">Temperature vs RPM</div>
+          <p style="font-size:13px;color:var(--text-secondary);">Clear positive trend — motor temperature rises proportionally with speed. Useful for thermal fault threshold calibration.</p>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:4px;">Motor Speed vs Voltage</div>
+          <p style="font-size:13px;color:var(--text-secondary);">Linear relationship between supply voltage and RPM. Voltage sag detected as precursor to speed instability.</p>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:4px;">Current Spikes → Fault Flags</div>
+          <p style="font-size:13px;color:var(--text-secondary);">Overcurrent events correlate with bearing load anomalies captured simultaneously by the MPU-6050 gyroscope.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ FIRMWARE REFERENCE ═══════════════ -->
+  <section class="section">
+    <div class="section-label">Firmware Reference</div>
+    <h2 class="section-title">ESP32 Sensor Register Map</h2>
+    <p class="section-desc">Key GPIO assignments and register addresses used in the CareFlow EV firmware.</p>
+
+    <div class="reg-cols">
+      <div class="reg-section">
+        <div class="reg-section-title">Analog Inputs</div>
+        <div class="reg-entry"><span class="reg-addr">GPIO 34</span><span class="reg-name">ACS712 Current</span><span class="reg-type">ADC1</span></div>
+        <div class="reg-entry"><span class="reg-addr">GPIO 35</span><span class="reg-name">Voltage Sensor</span><span class="reg-type">ADC1</span></div>
+      </div>
+      <div class="reg-section">
+        <div class="reg-section-title">I²C Bus</div>
+        <div class="reg-entry"><span class="reg-addr">0x68</span><span class="reg-name">MPU-6050 Accel/Gyro</span><span class="reg-type">GPIO 21/22</span></div>
+        <div class="reg-entry"><span class="reg-addr">0x3C</span><span class="reg-name">SSD1306 OLED Display</span><span class="reg-type">GPIO 4/5</span></div>
+      </div>
+      <div class="reg-section">
+        <div class="reg-section-title">Digital / Interrupt</div>
+        <div class="reg-entry"><span class="reg-addr">GPIO 26</span><span class="reg-name">NK200 RPM Pulse</span><span class="reg-type">ISR FALLING</span></div>
+        <div class="reg-entry"><span class="reg-addr">1-Wire</span><span class="reg-name">DS18B20 Temperature</span><span class="reg-type">Dallas Protocol</span></div>
+      </div>
+      <div class="reg-section">
+        <div class="reg-section-title">InfluxDB Fields</div>
+        <div class="reg-entry"><span class="reg-addr">current</span><span class="reg-name">RMS current (A)</span><span class="reg-type">FLOAT</span></div>
+        <div class="reg-entry"><span class="reg-addr">rpm</span><span class="reg-name">Motor speed (RPM)</span><span class="reg-type">FLOAT</span></div>
+        <div class="reg-entry"><span class="reg-addr">temperature</span><span class="reg-name">Motor temp (°C)</span><span class="reg-type">FLOAT</span></div>
+        <div class="reg-entry"><span class="reg-addr">voltage</span><span class="reg-name">Supply voltage (V)</span><span class="reg-type">FLOAT</span></div>
+        <div class="reg-entry"><span class="reg-addr">gyroX/Y/Z</span><span class="reg-name">Angular velocity</span><span class="reg-type">FLOAT</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ TIMELINE ═══════════════ -->
+  <section class="section" id="timeline">
+    <div class="section-label">Project Status</div>
+    <h2 class="section-title">Development Timeline</h2>
+    <p class="section-desc" style="margin-bottom:36px;">From thesis proposal through hardware assembly to data collection and ML integration.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-phase done">PHASE 01 · DONE</div>
+        <div class="tl-line"><div class="tl-dot done"></div><div class="tl-track"></div></div>
+        <div class="tl-content">
+          <h3>Thesis Proposal &amp; Literature Review</h3>
+          <p>Reviewed 8+ published studies on SVM, LSTM and CNN-based EV motor fault detection. Identified research gap in affordable embedded-system solutions. Proposal approved by Supervisor.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-phase done">PHASE 02 · DONE</div>
+        <div class="tl-line"><div class="tl-dot done"></div><div class="tl-track"></div></div>
+        <div class="tl-content">
+          <h3>Hardware Assembly &amp; Wiring</h3>
+          <p>Assembled ESP32 with DS18B20, MPU-6050, ACS712 current sensor, NK200 RPM sensor and OLED display. Wired 12V → 5V buck converter. Verified all sensor readings via Serial monitor.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-phase done">PHASE 03 · DONE</div>
+        <div class="tl-line"><div class="tl-dot done"></div><div class="tl-track"></div></div>
+        <div class="tl-content">
+          <h3>Firmware Development (ESP32)</h3>
+          <p>FreeRTOS-based firmware with interrupt-driven RPM counter, I2C polling for MPU-6050, RMS current computation, 5-second gyro/current calibration on boot, and InfluxDB HTTP push every 3s.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-phase done">PHASE 04 · DONE</div>
+        <div class="tl-line"><div class="tl-dot done"></div><div class="tl-track"></div></div>
+        <div class="tl-content">
+          <h3>Data Pipeline: InfluxDB + Grafana</h3>
+          <p>Deployed InfluxDB on Raspberry Pi 4. Validated voltage, current and RPM data push from ESP32. Built Grafana dashboards with gauge charts and time-series graphs for all 8 sensor fields.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-phase done">PHASE 05 · DONE</div>
+        <div class="tl-line"><div class="tl-dot done"></div><div class="tl-track"></div></div>
+        <div class="tl-content">
+          <h3>Dataset Collection &amp; Correlation Analysis</h3>
+          <p>Collected real EV motor dataset (MY_EV_DATASET.csv). Plotted Temperature vs RPM, Motor Speed vs Voltage, and correlation heatmap. Confirmed meaningful sensor relationships for ML training.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-phase active">PHASE 06 · IN PROGRESS</div>
+        <div class="tl-line"><div class="tl-dot active"></div><div class="tl-track"></div></div>
+        <div class="tl-content">
+          <h3>ML Model Training &amp; Evaluation</h3>
+          <p>Training Random Forest, LSTM and 1D-CNN models on collected dataset. Evaluating prediction accuracy, false positive rate and inference latency on Raspberry Pi 4. Flask API integration ongoing.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-phase future">PHASE 07 · PLANNED</div>
+        <div class="tl-line"><div class="tl-dot future"></div><div class="tl-track"></div></div>
+        <div class="tl-content">
+          <h3>Predictive RUL Estimation &amp; Alerts</h3>
+          <p>Remaining Useful Life (RUL) regression model. Automated Grafana alert notifications (SMS/email) on threshold breach. Continuous model retraining pipeline with new operational data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+<footer>
+  <span>EV MOTOR HEALTH MONITOR — B.SC. THESIS · CUET · 2025</span>
+  <span>JULFIKER IBN HAIDER · SOUTHERN IOT · 2025–2026</span>
+</footer>
+
+</body>
+</html>
