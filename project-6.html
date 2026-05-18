@@ -1,57 +1,295 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Energy Monitoring System (V2) | Julfiker Ibn Haider</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-  <script id="tailwind-config">
-    tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" }, fontFamily: { "display": ["Space Grotesk"] } } } }
-  </script>
-  <style> body { font-family: "Space Grotesk", sans-serif; } </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Energy Monitoring of Chair Lift | Julfiker Ibn Haider</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg-void:#050507;--bg-surface:rgba(255,255,255,.035);--border:rgba(255,255,255,.07);
+  --accent:#4ade80;--teal:#2dd4bf;--green:#4ade80;--blue:#60a5fa;
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#475569;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-void);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0 48px;height:60px;background:rgba(5,5,7,.9);border-bottom:1px solid var(--border)}
+.nav-logo{color:var(--text-primary);text-decoration:none;font-family:var(--mono);font-size:13px;font-weight:600}
+.nav-logo .hex{color:var(--accent)}
+.nav-links{display:flex;gap:24px;list-style:none}
+.nav-links a{color:var(--text-secondary);text-decoration:none;font-family:var(--mono);font-size:12px}
+.page{max-width:1100px;margin:0 auto;padding:0 48px 80px}
+.breadcrumb{padding:20px 0 0;font-family:var(--mono);font-size:11px;color:var(--text-muted)}
+.breadcrumb a{color:var(--accent);text-decoration:none}
+.section{margin-top:56px}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.section-title{font-size:26px;font-weight:700;margin-bottom:8px}
+.section-desc{color:var(--text-secondary);margin-bottom:24px;font-size:14px;max-width:680px}
+.hero-img{width:100%;max-height:400px;object-fit:cover;border-radius:12px;border:1px solid var(--border);margin:20px 0}
+.badge{display:inline-block;padding:4px 10px;margin:0 6px 6px 0;border-radius:4px;font-family:var(--mono);font-size:10px;border:1px solid var(--border)}
+.badge-green{color:var(--green);border-color:rgba(74,222,128,.3)}
+.tag{display:inline-block;padding:4px 10px;margin:4px;border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--text-secondary)}
+.btn{display:inline-block;padding:10px 18px;margin:4px 8px 4px 0;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:600;text-decoration:none}
+.btn-primary{background:var(--accent);color:#000}
+.btn-outline{border:1px solid var(--border);color:var(--text-secondary)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0}
+.stat-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:16px}
+.stat-label{font-family:var(--mono);font-size:9px;color:var(--text-muted);text-transform:uppercase}
+.stat-value{font-family:var(--mono);font-size:18px;font-weight:600}
+.doc-toc{display:flex;flex-wrap:wrap;gap:8px;padding:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;margin-bottom:24px}
+.doc-toc a{font-family:var(--mono);font-size:11px;color:var(--text-secondary);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:4px}
+.abstract-box,.arch-card,.phase-card,.img-card,.contrib-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:18px}
+.abstract-box{border-left:3px solid var(--teal)}
+.issue-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.issue-list li{padding:12px 16px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;font-size:13px;color:var(--text-secondary)}
+.phase-grid,.arch-grid,.img-grid,.contributors{display:grid;gap:14px;margin-top:16px}
+.phase-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.arch-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.img-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.contributors{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.img-card img{width:100%;height:190px;object-fit:cover;display:block}
+.img-card figcaption{padding:12px;font-size:12px;color:var(--text-secondary);border-top:1px solid var(--border)}
+.pre-block,.code-block{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:8px;padding:14px;overflow-x:auto;margin:14px 0;color:var(--teal);white-space:pre}
+.code-block{color:var(--accent)}
+.flow{display:flex;align-items:center;overflow-x:auto;padding:16px 0;gap:4px}
+.flow-box{min-width:90px;text-align:center;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:11px}
+.flow-arrow{color:var(--accent);font-family:var(--mono)}
+.circuit-wrap{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto;margin:16px 0}
+.circuit-wrap svg{width:100%;min-height:240px;display:block}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;margin:12px 0}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--accent);font-size:9px;text-transform:uppercase}
+.check-list{list-style:none}
+.check-list li{padding:6px 0 6px 16px;position:relative;font-size:13px;color:var(--text-secondary)}
+.check-list li::before{content:'+';position:absolute;left:0;color:var(--green);font-weight:700}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding:0 0 16px 36px;position:relative;font-size:13px;color:var(--text-secondary)}
+.steps li::before{content:counter(s);position:absolute;left:0;width:24px;height:24px;border-radius:50%;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.35);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.steps strong{display:block;color:var(--text-primary);margin-bottom:4px}
+.safety-box{margin-top:16px;padding:16px;border:1px solid rgba(248,113,113,.3);border-radius:8px;background:rgba(248,113,113,.08);font-size:13px;color:var(--text-secondary)}
+footer{margin-top:64px;padding:20px 0;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
-  <header class="border-b border-solid border-slate-200 dark:border-slate-800 px-6 md:px-20 py-4 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-50 flex items-center">
-    <div class="flex items-center gap-4">
-      <a href="index.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-primary transition-colors font-medium">
-        <span class="material-symbols-outlined">arrow_back</span> Back to Portfolio
-      </a>
-      <span class="text-slate-300 dark:text-slate-700">|</span>
-      <a href="My_CV.pdf" target="_blank" class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors font-medium flex items-center gap-1">
-        <span class="material-symbols-outlined" style="font-size: 18px;">description</span> Resume
-      </a>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html"><span class="hex">//</span> JULFIKER IBN HAIDER</a>
+  <ul class="nav-links"><li><a href="index.html#projects">Projects</a></li><li><a href="My_CV.pdf">Resume</a></li></ul>
+</nav>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Back to Portfolio</a> | Energy Monitoring of Chair Lift</div>
+
+  <section class="hero">
+    <span class="badge badge-green">LIVE MONITORING</span>
+    <span class="badge">REHABILITATION</span>
+    <span class="badge">MIT LICENSE</span>
+    <h1 class="section-title" style="margin-top:16px;font-size:36px">Energy Monitoring of Chair Lift</h1>
+    <p class="section-desc">Hardware rehabilitation, Pico-based chair control, and INA238 + ESP32-C6 real-time power monitoring with web dashboard and CSV logging.</p>
+    <img class="hero-img" src="chair-lift/images/energy-monitoring/Energy_monitoring.jpeg" alt="Monitoring hardware"/>
+    <div><span class="tag">ESP32-C6</span><span class="tag">INA238</span><span class="tag">MicroPython</span><span class="tag">Pico</span><span class="tag">I2C</span></div>
+    <div style="margin-top:16px">
+      <a class="btn btn-primary" href="#documentation">Documentation</a>
+      <a class="btn btn-outline" href="#circuit">Circuit</a>
+      <a class="btn btn-outline" href="#gallery">Gallery</a>
     </div>
-  </header>
-  <main class="flex-1 px-6 md:px-20 py-10 max-w-[1000px] mx-auto w-full">
-    <div class="mb-8">
-      <span class="text-primary font-bold tracking-widest uppercase text-sm">Industrial IoT</span>
-      <h1 class="text-4xl md:text-5xl font-black mt-2 mb-4 text-slate-900 dark:text-white">Energy Monitoring System</h1>
-      <div class="flex flex-wrap gap-2 mb-8">
-        <span class="px-3 py-1 text-xs font-bold bg-primary/10 text-primary rounded-full">RAK3173</span>
-        <span class="px-3 py-1 text-xs font-bold bg-primary/10 text-primary rounded-full">LoRaWAN</span>
-      </div>
-      <div class="aspect-video relative overflow-hidden bg-slate-200 dark:bg-slate-800 rounded-xl max-w-4xl shadow-xl">
-        <img class="w-full h-full object-cover" alt="Industrial IoT Energy Monitoring System V2" src="https://images.unsplash.com/photo-1541888001133-728b12cbba9f?auto=format&fit=crop&q=80" />
-      </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Voltage</div><div class="stat-value">0-85V</div></div>
+      <div class="stat-card"><div class="stat-label">Current</div><div class="stat-value">10A</div></div>
+      <div class="stat-card"><div class="stat-label">Supply</div><div class="stat-value">24V</div></div>
+      <div class="stat-card"><div class="stat-label">History</div><div class="stat-value">2 hr</div></div>
     </div>
-    <div class="prose prose-slate dark:prose-invert max-w-none">
-      <h2 class="text-2xl font-bold mt-10 mb-4 text-slate-900 dark:text-white">Project Overview</h2>
-      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-        An iteration on the Industrial IoT Energy Monitoring System, capturing deeper insights into 3-phase power delivery and expanding LoRaWAN node compatibility. This deployment ensures plant managers always have reliable analytics at their fingertips.
-      </p>
-      <h3 class="text-xl font-bold mt-8 mb-3 text-slate-900 dark:text-white">Highlights</h3>
-      <ul class="list-disc list-inside text-slate-600 dark:text-slate-400 leading-relaxed space-y-2 mb-6">
-        <li>Upgraded microcontroller processing routines to handle higher polling rates.</li>
-        <li>Extended gateway antenna performance.</li>
-        <li>Integrated custom anomaly detection algorithms.</li>
-        <li>Optimized power consumption for field nodes.</li>
-      </ul>
+  </section>
+
+  <section class="section" id="documentation">
+    <div class="section-label">Documentation</div>
+    <h2 class="section-title">Stair Lift Rehabilitation and Energy Monitoring</h2>
+    <p class="section-desc">Full project documentation (formerly public repo README), integrated on this page.</p>
+    <nav class="doc-toc">
+      <a href="#problem">Problem</a><a href="#solution">Solution</a><a href="#architecture">Architecture</a>
+      <a href="#circuit">Circuit</a><a href="#hardware">Hardware</a><a href="#software">Software</a>
+      <a href="#installation">Installation</a><a href="#gallery">Gallery</a><a href="#team">Team</a>
+    </nav>
+    <div class="abstract-box"><p>The stair lift failed due to an incompatible charger (burned battery, motor driver, blown fuses). We replaced components, added a safety-focused Pico controller, and deployed non-invasive energy monitoring on the 24V bus.</p></div>
+  </section>
+
+  <section class="section" id="problem">
+    <div class="section-label">Problem</div>
+    <h2 class="section-title">Critical Hardware Failures</h2>
+    <ul class="issue-list">
+      <li><strong>Battery burned out</strong> - wrong charger caused thermal runaway.</li>
+      <li><strong>Motor driver destroyed</strong> - overvoltage disabled the motor.</li>
+      <li><strong>Wrong charger (root cause)</strong> - voltage mismatch cascaded through the system.</li>
+      <li><strong>Fuse blown</strong> - repeated overcurrent stress.</li>
+    </ul>
+  </section>
+
+  <section class="section" id="solution">
+    <div class="section-label">Solution</div>
+    <h2 class="section-title">Rehabilitation Phases</h2>
+    <div class="phase-grid">
+      <div class="phase-card"><h4>Phase 1 - Hardware</h4><ul><li>New battery and motor driver</li><li>24V 2A approved charger</li><li>10A fuse upgrade</li></ul><div class="status">Completed</div></div>
+      <div class="phase-card"><h4>Phase 2 - Control</h4><ul><li>Pico UP/DOWN motor control</li><li>Limit switches and E-stop</li><li>NeoPixel and buzzer feedback</li></ul><div class="status">Completed</div></div>
+      <div class="phase-card"><h4>Phase 3 - Monitoring</h4><ul><li>INA238 V/I/P measurement</li><li>Web dashboard and CSV</li><li>MQTT optional</li></ul><div class="status">Completed</div></div>
     </div>
-  </main>
-  <footer class="border-t border-slate-200 dark:border-slate-800 py-6 px-6 md:px-20 bg-slate-50 dark:bg-background-dark flex justify-center text-slate-500 dark:text-slate-400 text-sm">
-    © 2024 Julfiker Ibn Haider.
-  </footer>
+  </section>
+
+  <section class="section" id="architecture">
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title">System Design</h2>
+    <div class="arch-grid">
+      <div class="arch-card"><h3>Raspberry Pi Pico</h3><p>PWM motor, brake/charge relays, limits, NeoPixel, buzzer, 1s start delay.</p></div>
+      <div class="arch-card"><h3>ESP32-C6</h3><p>WiFi, INA238 reader, AP PowerMonitor or station mode, WebSocket dashboard.</p></div>
+      <div class="arch-card"><h3>INA238</h3><p>I2C 0x40, 0.015 ohm shunt, 0-85V, +/-10A, temperature.</p></div>
+      <div class="arch-card"><h3>24V Bus</h3><p>Battery, approved charger, buck 24V to 5V for ESP32.</p></div>
+    </div>
+    <pre class="pre-block">Pico: inputs (calls, edges, stops) -> outputs (PWM, brake, charge, LED, buzzer)
+State: HEALTHY | ZONED (charging) | MOVING_UP | MOVING_DOWN</pre>
+  </section>
+
+  <section class="section">
+    <div class="section-label">Data flow</div>
+    <h2 class="section-title">Monitoring Pipeline</h2>
+    <div class="flow">
+      <div class="flow-box">24V Bus</div><span class="flow-arrow">-&gt;</span>
+      <div class="flow-box">INA238</div><span class="flow-arrow">-&gt;</span>
+      <div class="flow-box">ESP32-C6</div><span class="flow-arrow">-&gt;</span>
+      <div class="flow-box">Dashboard</div><span class="flow-arrow">-&gt;</span>
+      <div class="flow-box">CSV Log</div>
+    </div>
+  </section>
+
+  <section class="section" id="circuit">
+    <div class="section-label">Wiring</div>
+    <h2 class="section-title">Energy Monitoring Circuit</h2>
+    <div class="circuit-wrap"><svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6" fill="none" stroke="#4ade80" stroke-width="1"/>
+    </marker>
+    <marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6" fill="none" stroke="#2dd4bf" stroke-width="1"/>
+    </marker>
+  </defs>
+  <text x="450" y="24" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">CHAIR LIFT ENERGY MONITORING - WIRING DIAGRAM</text>
+  <rect x="30" y="70" width="110" height="90" rx="6" fill="rgba(74,222,128,0.08)" stroke="rgba(74,222,128,0.35)" stroke-width="1.2"/>
+  <text x="85" y="100" fill="#4ade80" font-size="11" text-anchor="middle" font-family="monospace">24V BATTERY</text>
+  <text x="85" y="118" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">Lead-Acid / Li-ion</text>
+  <text x="85" y="136" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">Chair lift supply</text>
+  <line x1="140" y1="110" x2="195" y2="110" stroke="#4ade80" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="195" y="55" width="150" height="130" rx="6" fill="rgba(45,212,191,0.07)" stroke="rgba(45,212,191,0.35)" stroke-width="1.2"/>
+  <text x="270" y="82" fill="#2dd4bf" font-size="11" text-anchor="middle" font-family="monospace">INA238</text>
+  <text x="270" y="100" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">I2C 0x40 | 0-85V | 10A</text>
+  <rect x="215" y="112" width="110" height="22" rx="3" fill="rgba(255,255,255,0.04)" stroke="rgba(45,212,191,0.25)"/>
+  <text x="270" y="127" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">Shunt 0.015 ohm</text>
+  <line x1="345" y1="110" x2="400" y2="110" stroke="#4ade80" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="400" y="75" width="120" height="80" rx="6" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.3)" stroke-width="1.2"/>
+  <text x="460" y="105" fill="#f59e0b" font-size="11" text-anchor="middle" font-family="monospace">CHAIR LIFT</text>
+  <text x="460" y="123" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">Motor / Driver</text>
+  <text x="460" y="141" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">24V DC load</text>
+  <line x1="85" y1="160" x2="85" y2="220" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="85" y1="220" x2="460" y2="220" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="460" y1="155" x2="460" y2="220" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="270" y="238" fill="#475569" font-size="9" text-anchor="middle" font-family="monospace">Common GND</text>
+  <line x1="140" y1="130" x2="140" y2="180" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="140" y1="180" x2="580" y2="180" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <rect x="580" y="155" width="110" height="70" rx="6" fill="rgba(96,165,250,0.08)" stroke="rgba(96,165,250,0.3)" stroke-width="1.2"/>
+  <text x="635" y="180" fill="#60a5fa" font-size="10" text-anchor="middle" font-family="monospace">BUCK 24-5V</text>
+  <text x="635" y="198" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">3A powers MCU</text>
+  <rect x="720" y="55" width="150" height="170" rx="6" fill="rgba(167,139,250,0.08)" stroke="rgba(167,139,250,0.35)" stroke-width="1.2"/>
+  <text x="795" y="82" fill="#a78bfa" font-size="11" text-anchor="middle" font-family="monospace">ESP32-C6</text>
+  <text x="795" y="100" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">MicroPython WiFi</text>
+  <text x="735" y="122" fill="#64748b" font-size="8" font-family="monospace">GPIO19 SDA</text>
+  <text x="735" y="138" fill="#64748b" font-size="8" font-family="monospace">GPIO20 SCL</text>
+  <text x="735" y="154" fill="#64748b" font-size="8" font-family="monospace">3.3V / GND</text>
+  <text x="735" y="170" fill="#64748b" font-size="8" font-family="monospace">5V from Buck</text>
+  <text x="735" y="210" fill="#4ade80" font-size="8" font-family="monospace">AP: PowerMonitor</text>
+  <line x1="690" y1="190" x2="718" y2="190" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="345" y1="152" x2="718" y2="130" stroke="#2dd4bf" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr2)"/>
+  <text x="560" y="122" fill="#2dd4bf" font-size="8" text-anchor="middle" font-family="monospace">I2C bus</text>
+  <rect x="580" y="248" width="290" height="52" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
+  <text x="725" y="270" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">Web dashboard | WebSocket | CSV | MQTT | 192.168.4.1</text>
+  <text x="725" y="288" fill="#475569" font-size="8" text-anchor="middle" font-family="monospace">High-side shunt on 24V chair lift bus</text>
+</svg></div>
+    <table>
+      <thead><tr><th>From</th><th>To</th><th>Signal</th></tr></thead>
+      <tbody>
+        <tr><td>24V +</td><td>INA238 VIN+</td><td class="td-mono">via shunt</td></tr>
+        <tr><td>INA238 VIN-</td><td>Load</td><td class="td-mono">motor path</td></tr>
+        <tr><td>INA238</td><td>ESP32</td><td class="td-mono">SDA 19, SCL 20</td></tr>
+        <tr><td>Buck</td><td>ESP32</td><td class="td-mono">5V</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section" id="hardware">
+    <div class="section-label">Hardware</div>
+    <h2 class="section-title">Bill of Materials</h2>
+    <table><thead><tr><th>Part</th><th>Spec</th></tr></thead><tbody>
+      <tr><td>Pico</td><td>Chair control</td></tr>
+      <tr><td>ESP32-C6 + INA238</td><td>Energy monitor</td></tr>
+      <tr><td>24V battery / 2A charger</td><td>Power</td></tr>
+      <tr><td>Buck 24-5V</td><td>MCU supply</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="section" id="software">
+    <div class="section-label">Firmware</div>
+    <h2 class="section-title">Software Features</h2>
+    <ul class="check-list">
+      <li>Real-time V, I, P, temp, kWh, cost</li>
+      <li>2-hour charts, WebSocket, CSV export</li>
+      <li>WiFi AP PowerMonitor, http://192.168.4.1</li>
+      <li>Pico: limits, brake, charge relay, LED states</li>
+    </ul>
+    <pre class="code-block">PWM_UP=26 PWM_DOWN=27 | INA238 SDA=19 SCL=20 | AP: PowerMonitor</pre>
+  </section>
+
+  <section class="section" id="installation">
+    <div class="section-label">Setup</div>
+    <h2 class="section-title">Installation</h2>
+    <ol class="steps">
+      <li><strong>Pico</strong>Flash MicroPython; copy Chair_Lift_Main/main.py; test I/O.</li>
+      <li><strong>ESP32-C6</strong>Flash firmware; copy Energy_Monitoring/main.py.</li>
+      <li><strong>Connect</strong>Join AP PowerMonitor (password ina238pro); open http://192.168.4.1</li>
+    </ol>
+  </section>
+
+  <section class="section" id="gallery">
+    <div class="section-label">Gallery</div>
+    <h2 class="section-title">Project Images</h2>
+    <div class="img-grid">
+      <figure class="img-card"><img src="chair-lift/images/chair-lift/previous_batter.jpeg" alt="Damaged battery"/><figcaption><strong>Before</strong>Burned battery from wrong charger.</figcaption></figure>
+      <figure class="img-card"><img src="chair-lift/images/chair-lift/New_Battery_installed.jpeg" alt="New battery"/><figcaption><strong>After</strong>New battery installed.</figcaption></figure>
+      <figure class="img-card"><img src="chair-lift/images/chair-lift/Current_Charger.jpeg" alt="Correct charger"/><figcaption><strong>Correct charger</strong>24V approved unit.</figcaption></figure>
+      <figure class="img-card"><img src="chair-lift/images/chair-lift/Fuse.jpeg" alt="Fuse"/><figcaption><strong>Fuse</strong>10A protection.</figcaption></figure>
+      <figure class="img-card"><img src="chair-lift/images/energy-monitoring/Energy_monitoring.jpeg" alt="Monitor"/><figcaption><strong>Monitor hardware</strong>INA238 + ESP32-C6.</figcaption></figure>
+      <figure class="img-card"><img src="chair-lift/images/energy-monitoring/Energy_monitoring_live_site1.jpeg" alt="Dashboard"/><figcaption><strong>Live dashboard</strong>Power and voltage graphs.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="section" id="team">
+    <div class="section-label">Team</div>
+    <h2 class="section-title">Contributors</h2>
+    <div class="contributors">
+      <div class="contrib-card"><div class="role">Hardware</div><div class="name">Sama E Shan Shoummo</div></div>
+      <div class="contrib-card"><div class="role">Control</div><div class="name">Sultan Mahmud Saad</div></div>
+      <div class="contrib-card"><div class="role">Energy monitoring</div><div class="name">Nafis Mohammad Redwan</div></div>
+      <div class="contrib-card"><div class="role">Integration</div><div class="name">Julfiker Ibn Haider</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="achievements">
+    <div class="section-label">Outcomes</div>
+    <h2 class="section-title">Key Achievements</h2>
+    <ul class="check-list">
+      <li>Resolved root-cause charger failure and restored safe operation</li>
+      <li>State-machine control with redundant safety on Pico</li>
+      <li>Live energy analytics with web UI and CSV logging</li>
+    </ul>
+    <div class="safety-box"><p><strong>Safety:</strong> High voltage and moving parts. Follow electrical codes; inspect regularly.</p></div>
+  </section>
+</div>
+<footer><span>(c) 2024-2026 Julfiker Ibn Haider</span><span>MIT License</span></footer>
 </body>
 </html>
