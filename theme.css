@@ -1,0 +1,246 @@
+/* ═════════════════════════════════════════════════════════════════════
+   WARM INDUSTRIAL THEME — shared by every page.
+   Paper background, charcoal ink, safety-orange accent, condensed heads.
+   Project pages link this AFTER their own <style> so the variable
+   mapping below wins; the home page (body.home) is styled directly.
+   ═════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* core tokens — light / paper */
+  --ind-paper:      #f3efe6;
+  --ind-paper-2:    #eae4d6;
+  --ind-card:       #fbf9f4;
+  --ind-ink:        #1c1b19;
+  --ind-ink-2:      #47443d;
+  --ind-ink-3:      #6b665c;
+  --ind-rule:       #d4ccbb;
+  --ind-rule-2:     #bdb3a0;
+  --ind-orange:     #c2410c;   /* accent text on paper (AA) */
+  --ind-orange-fill:#f26b1d;   /* buttons, bars, markers */
+  --ind-orange-bg:  rgba(242,107,29,0.12);
+  --ind-on-orange:  #1c1b19;
+  --ind-steel:      #2d5b7a;   /* secondary accent */
+  --ind-steel-bg:   rgba(45,91,122,0.10);
+  --ind-green:      #2f7d32;
+  --ind-red:        #b42318;
+  --ind-screen:     #1c1b19;   /* terminal / control-panel screens */
+  --ind-screen-ink: #ede6d6;
+  --ind-shadow:     4px 4px 0 var(--ind-ink);
+  --ind-display:    'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --ind-sans:       'IBM Plex Sans', system-ui, sans-serif;
+  --ind-mono:       'IBM Plex Mono', ui-monospace, monospace;
+  --ind-r-lg:       12px;      /* cards, panels */
+  --ind-r-md:       8px;       /* buttons, inputs, list rows */
+  --ind-r-sm:       5px;       /* tags, badges */
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --ind-paper:      #161513;
+  --ind-paper-2:    #1d1b18;
+  --ind-card:       #211f1b;
+  --ind-ink:        #ede8dd;
+  --ind-ink-2:      #c3bcad;
+  --ind-ink-3:      #958e80;
+  --ind-rule:       #36322b;
+  --ind-rule-2:     #4a443a;
+  --ind-orange:     #ff8a3d;
+  --ind-orange-fill:#f26b1d;
+  --ind-orange-bg:  rgba(242,107,29,0.16);
+  --ind-on-orange:  #1c1b19;
+  --ind-steel:      #8fbcd9;
+  --ind-steel-bg:   rgba(143,188,217,0.12);
+  --ind-green:      #7cc47f;
+  --ind-red:        #f2867c;
+  --ind-screen:     #0f0e0c;
+  --ind-screen-ink: #ede6d6;
+  --ind-shadow:     4px 4px 0 #000;
+  color-scheme: dark;
+}
+
+/* ── Variable mapping for the project pages (each was built with its own
+      names; all now resolve to the industrial tokens) ── */
+:root, html[data-theme="light"], html[data-theme="dark"] {
+  /* project-1 / project-5 */
+  --bg: var(--ind-paper);          --bg2: var(--ind-card);        --bg3: var(--ind-paper-2);
+  --border2: var(--ind-rule-2);    --muted: var(--ind-ink-3);     --muted2: var(--ind-ink-2);
+  --blue: var(--ind-steel);        --blue-bright: var(--ind-steel); --blue-dim: var(--ind-steel-bg);
+  --orange: var(--ind-orange);     --purple: var(--ind-steel);
+  /* project-4 */
+  --bg-deep: var(--ind-paper);     --bg-card: var(--ind-card);    --border-subtle: var(--ind-rule);
+  --primary: var(--ind-orange);    --primary-hover: var(--ind-orange-fill); --primary-glow: transparent;
+  --text-light: var(--ind-ink);
+  /* project-6 / 7 / 9 */
+  --bg-void: var(--ind-paper);     --bg-base: var(--ind-card);    --bg-surface: var(--ind-card);
+  --bg-hover: var(--ind-paper-2);  --bg-code: var(--ind-paper-2); --nav-bg: var(--ind-paper);
+  --border-glow: var(--ind-orange-fill);
+  --accent: var(--ind-orange);     --accent-bg: var(--ind-orange-bg); --accent-line: var(--ind-orange-fill);
+  --amber: var(--ind-orange);      --amber-dim: var(--ind-orange-fill);
+  --teal: var(--ind-steel);        --teal-dim: var(--ind-steel);
+  --text-primary: var(--ind-ink);  --text-secondary: var(--ind-ink-2);
+  --red: var(--ind-red);
+  /* project-8 */
+  --void: var(--ind-paper);        --deep: var(--ind-paper-2);    --surface: var(--ind-card);
+  --glass: var(--ind-card);        --glass-border: var(--ind-rule); --glass-hover: var(--ind-paper-2);
+  --orange-dim: var(--ind-orange-bg); --orange-glow: transparent;
+  --cyan: var(--ind-steel);        --cyan-dim: var(--ind-steel-bg);
+  --green-dim: rgba(47,125,50,0.12);
+  /* shared names */
+  --border: var(--ind-rule);
+  --text: var(--ind-ink);          --text-dim: var(--ind-ink-2);  --text-muted: var(--ind-ink-3);
+  --green: var(--ind-green);
+  --sans: var(--ind-sans);         --body: var(--ind-sans);       --display: var(--ind-display);
+  --mono: var(--ind-mono);
+}
+
+/* ═════ Generic overrides for project pages ═════ */
+body:not(.home) {
+  background: var(--ind-paper) !important;
+  color: var(--ind-ink) !important;
+  font-family: var(--ind-sans) !important;
+  cursor: auto !important;
+}
+body:not(.home)::before,
+body:not(.home)::after { display: none !important; }
+
+body:not(.home) *,
+body:not(.home) *::before,
+body:not(.home) *::after { text-shadow: none !important; }
+
+/* Headings: bold condensed, like factory signage */
+body:not(.home) h1,
+body:not(.home) h2,
+body:not(.home) h3 {
+  font-family: var(--ind-display) !important;
+  letter-spacing: 0.01em !important;
+  color: var(--ind-ink);
+  -webkit-text-fill-color: currentColor !important;
+  background: none !important;
+}
+body:not(.home) h1,
+body:not(.home) h2 { text-transform: uppercase; font-weight: 800 !important; }
+body:not(.home) h1 { line-height: 1.02 !important; }
+
+/* Gradient / outlined text from the old themes → solid ink or orange */
+body:not(.home) .nav-logo,
+body:not(.home) .logo {
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--ind-ink) !important;
+  font-family: var(--ind-display) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase;
+}
+body:not(.home) h1 span,
+body:not(.home) h2 span,
+body:not(.home) .highlight {
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  -webkit-text-stroke: 0 !important;
+  color: var(--ind-orange) !important;
+}
+
+/* Top navigation bar */
+body:not(.home) > nav,
+body:not(.home) > header {
+  background: var(--ind-paper) !important;
+  border-bottom: 2px solid var(--ind-ink) !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Footers */
+body:not(.home) footer {
+  background: var(--ind-paper-2) !important;
+  border-top: 2px solid var(--ind-ink) !important;
+  color: var(--ind-ink-3) !important;
+}
+
+/* Code / pre blocks read as control-panel screens */
+body:not(.home) pre,
+body:not(.home) code {
+  font-family: var(--ind-mono) !important;
+}
+body:not(.home) pre {
+  background: var(--ind-screen) !important;
+  color: var(--ind-screen-ink) !important;
+  border: 1px solid var(--ind-ink) !important;
+  border-radius: var(--ind-r-md) !important;
+}
+
+/* Tables */
+body:not(.home) th {
+  background: var(--ind-paper-2) !important;
+  color: var(--ind-ink) !important;
+}
+body:not(.home) td, body:not(.home) th { border-color: var(--ind-rule) !important; }
+
+/* No decorative glows in this theme; also stop them widening the page */
+body:not(.home) .hero-glow,
+body:not(.home) #mouse-glow { display: none !important; }
+body:not(.home) { overflow-x: clip; }
+body:not(.home) img, body:not(.home) video { max-width: 100%; }
+body:not(.home) .model-showcase > *,
+body:not(.home) .battery-layout > *,
+body:not(.home) .manual-grid > *,
+body:not(.home) .batt-specs-list { min-width: 0; }
+body:not(.home) .batt-spec-content { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+/* Rounded boxes on every project page */
+body:not(.home) [class*="card"]:not([class*="card-"]),
+body:not(.home) [class*="-box"],
+body:not(.home) figure,
+body:not(.home) .table-wrap,
+body:not(.home) .callout,
+body:not(.home) .diagram,
+body:not(.home) .circuit-wrap,
+body:not(.home) .doc-toc,
+body:not(.home) .model-frame,
+body:not(.home) .battery-diagram,
+body:not(.home) .batt-spec-item,
+body:not(.home) .step-item,
+body:not(.home) .tab-container,
+body:not(.home) .hero-img,
+body:not(.home) canvas {
+  border-radius: var(--ind-r-lg) !important;
+}
+body:not(.home) figure,
+body:not(.home) .table-wrap,
+body:not(.home) .tab-container { overflow: hidden; }
+
+/* Wide tables scroll inside themselves on phones instead of widening the page */
+@media (max-width: 640px) {
+  body:not(.home) table { display: block; max-width: 100%; overflow-x: auto; }
+  body:not(.home) .nav-links { gap: 0.75rem !important; }
+  body:not(.home) .model-frame,
+  body:not(.home) .batt-spec-content { max-width: 100% !important; min-width: 0 !important; overflow-wrap: anywhere; }
+  body:not(.home) .model-frame a { white-space: normal; text-align: center; }
+  body:not(.home) .tab-nav { overflow-x: auto; }
+  body:not(.home) .tab-btn { flex: 0 0 auto; }
+  body:not(.home) .step-item { grid-template-columns: 40px minmax(0, 1fr) !important; }
+  body:not(.home) .step-content { min-width: 0; overflow-wrap: anywhere; }
+}
+
+/* Links */
+body:not(.home) a { text-underline-offset: 3px; }
+
+/* Theme toggle used on project pages */
+.ind-theme-btn {
+  font-family: var(--ind-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ind-ink);
+  background: var(--ind-card);
+  border: 1.5px solid var(--ind-ink);
+  border-radius: var(--ind-r-sm);
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.ind-theme-btn:hover { background: var(--ind-orange-fill); color: var(--ind-on-orange); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
