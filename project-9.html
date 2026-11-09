@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Knitting Floor Monitor | Julfiker Ibn Haider</title>
+<meta name="description" content="Listen-only Python monitor that decodes the GD NetLink UDP status reports of JINHAO flat knitting machines into a live web dashboard with stop, alarm and utilisation tracking."/>
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.setAttribute('data-theme', 'light');
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root,[data-theme="dark"]{
+  --bg-void:#050507;--bg-surface:rgba(255,255,255,.035);--bg-code:rgba(0,0,0,.35);--border:rgba(255,255,255,.08);
+  --accent:#f59e0b;--accent-bg:rgba(245,158,11,.12);--accent-line:rgba(245,158,11,.35);
+  --teal:#2dd4bf;--green:#4ade80;--red:#f87171;--blue:#60a5fa;
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --nav-bg:rgba(5,5,7,.9);
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+[data-theme="light"]{
+  --bg-void:#f4f6f9;--bg-surface:#ffffff;--bg-code:#eef1f5;--border:rgba(0,0,0,.1);
+  --accent:#b45309;--accent-bg:rgba(217,119,6,.1);--accent-line:rgba(217,119,6,.4);
+  --teal:#0f766e;--green:#15803d;--red:#b91c1c;--blue:#1d4ed8;
+  --text-primary:#0f172a;--text-secondary:#475569;--text-muted:#64748b;
+  --nav-bg:rgba(244,246,249,.92);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-void);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+nav.top{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 clamp(16px,4vw,48px);height:60px;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-logo{color:var(--text-primary);text-decoration:none;font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap}
+.nav-logo .hex{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:20px}
+.nav-links{display:flex;gap:20px;list-style:none}
+.nav-links a{color:var(--text-secondary);text-decoration:none;font-family:var(--mono);font-size:12px}
+.nav-links a:hover{color:var(--accent)}
+.theme-btn{font-family:var(--mono);font-size:11px;color:var(--text-secondary);background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.page{max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,48px) 80px}
+.breadcrumb{padding:20px 0 0;font-family:var(--mono);font-size:11px;color:var(--text-muted)}
+.breadcrumb a{text-decoration:none}
+.section{margin-top:64px;scroll-margin-top:72px}
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.section-title{font-size:clamp(22px,3vw,28px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.section-desc{color:var(--text-secondary);margin-bottom:24px;font-size:15px;max-width:720px}
+h1.section-title{font-size:clamp(28px,5vw,42px);margin-top:16px}
+h3{font-size:16px;margin-bottom:6px}
+p+p{margin-top:10px}
+.badge{display:inline-block;padding:4px 10px;margin:0 6px 6px 0;border-radius:4px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;border:1px solid var(--border);color:var(--text-secondary)}
+.badge-accent{color:var(--accent);border-color:var(--accent-line);background:var(--accent-bg)}
+.tag{display:inline-block;padding:4px 10px;margin:4px 6px 0 0;border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--text-secondary)}
+.hero-img{width:100%;max-height:440px;object-fit:cover;border-radius:12px;border:1px solid var(--border);margin:20px 0 12px;display:block}
+.role-line{font-family:var(--mono);font-size:12px;color:var(--text-muted);margin-top:4px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:24px 0}
+.stat-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:16px}
+.stat-value{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent)}
+.stat-label{font-size:12px;color:var(--text-secondary);line-height:1.4;margin-top:2px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.toc a{font-family:var(--mono);font-size:11px;color:var(--text-secondary);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg-surface)}
+.toc a:hover{color:var(--accent);border-color:var(--accent-line)}
+.callout{background:var(--bg-surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:16px 18px;font-size:14px;color:var(--text-secondary)}
+.callout strong{color:var(--text-primary)}
+.callout.teal{border-left-color:var(--teal)}
+.callout.red{border-left-color:var(--red)}
+.callout.green{border-left-color:var(--green)}
+.grid-2,.grid-3{display:grid;gap:14px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:18px}
+.card p,.card li{font-size:14px;color:var(--text-secondary)}
+.card ul{padding-left:18px}
+.diagram{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto;margin:16px 0}
+.diagram svg{width:100%;min-width:640px;height:auto;display:block}
+.diagram svg text{font-family:var(--mono)}
+.d-box{fill:var(--bg-code);stroke:var(--border)}
+.d-accent{fill:var(--accent-bg);stroke:var(--accent-line)}
+.d-teal{fill:rgba(45,212,191,.08);stroke:var(--teal);stroke-opacity:.5}
+.d-title{fill:var(--text-primary);font-size:13px;font-weight:600}
+.d-sub{fill:var(--text-muted);font-size:10.5px}
+.d-line{stroke:var(--accent);stroke-width:1.6;fill:none}
+.d-label{fill:var(--accent);font-size:10.5px}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding:0 0 18px 40px;position:relative;font-size:14px;color:var(--text-secondary)}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-line);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.steps strong{display:block;color:var(--text-primary)}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;margin:14px 0;background:var(--bg-surface)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-family:var(--mono);color:var(--accent);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;white-space:nowrap}
+td{color:var(--text-secondary)}
+td.mono,code{font-family:var(--mono);font-size:12px}
+td.num{text-align:right;font-family:var(--mono);white-space:nowrap}
+td strong{color:var(--text-primary)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill-ok{color:var(--green);background:rgba(74,222,128,.12)}
+.pill-obs{color:var(--blue);background:rgba(96,165,250,.12)}
+.pill-bad{color:var(--red);background:rgba(248,113,113,.12)}
+.shots{display:grid;gap:18px}
+figure.shot{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+figure.shot a{display:block;background:#fff}
+figure.shot img{width:100%;display:block}
+figure.shot figcaption{padding:12px 14px;font-size:13px;color:var(--text-secondary);border-top:1px solid var(--border)}
+figure.shot figcaption strong{color:var(--text-primary)}
+.shot-row{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.photo-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.photo-grid img{height:220px;object-fit:cover}
+.check-list{list-style:none}
+.check-list li{padding:6px 0 6px 20px;position:relative;font-size:14px;color:var(--text-secondary)}
+.check-list li::before{content:'+';position:absolute;left:0;color:var(--accent);font-family:var(--mono);font-weight:700}
+footer{margin-top:72px;padding:20px 0;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+footer a{color:var(--text-muted);text-decoration:none}
+footer a:hover{color:var(--accent)}
+@media (max-width:640px){.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav class="top">
+  <a class="nav-logo" href="index.html"><span class="hex">//</span> JULFIKER IBN HAIDER</a>
+  <div class="nav-right">
+    <ul class="nav-links"><li><a href="index.html#projects">Projects</a></li><li><a href="My_CV.pdf" target="_blank">Resume</a></li></ul>
+    <button type="button" class="theme-btn" id="theme-btn" aria-label="Toggle light or dark mode">Light</button>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="breadcrumb"><a href="index.html#projects">← Back to Portfolio</a> &nbsp;|&nbsp; Knitting Floor Monitor</div>
+
+  <!-- HERO -->
+  <section>
+    <div style="margin-top:20px">
+      <span class="badge badge-accent">INDUSTRIAL IOT</span>
+      <span class="badge">PROTOCOL DECODING</span>
+      <span class="badge">DEPLOYED ON SITE · NOV 2026</span>
+    </div>
+    <h1 class="section-title">Knitting Floor Monitor</h1>
+    <p class="section-desc">Live machine data over Ethernet from JINHAO GD-H122SA flat knitting machines. I decoded the vendor's GD NetLink UDP status reports and built a listen-only Python monitor with a live web dashboard that tracks run state, speed, cycle time, stops and alarms.</p>
+    <div class="role-line">Role: Developer · Southern IoT &nbsp;·&nbsp; Python standard library + one HTML page</div>
+    <img class="hero-img" src="knitting-monitor/machine.jpg" alt="JINHAO GD-H122SA flat knitting machine on the factory floor with yarn cones above the needle bed"/>
+    <div>
+      <span class="tag">Python 3.11</span><span class="tag">UDP / GD NetLink</span><span class="tag">Binary protocol decoding</span><span class="tag">CRC-16</span><span class="tag">Ethernet</span><span class="tag">Web dashboard</span><span class="tag">CSV logging</span>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">machine values decoded from every report</div></div>
+      <div class="stat-card"><div class="stat-value">10.6 s</div><div class="stat-label">report interval, measured</div></div>
+      <div class="stat-card"><div class="stat-value">100%</div><div class="stat-label">decoded fields matched an independent parser</div></div>
+      <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">commands sent to the machines</div></div>
+    </div>
+
+    <nav class="toc" aria-label="On this page">
+      <a href="#problem">Problem</a><a href="#setup">Setup</a><a href="#capture">Data capture</a><a href="#protocol">Protocol</a>
+      <a href="#dashboard">Dashboard</a><a href="#verification">Verification</a><a href="#results">Results</a>
+      <a href="#efficiency">Efficiency</a><a href="#findings">Findings</a>
+    </nav>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section" id="problem">
+    <div class="section-label">The problem</div>
+    <h2 class="section-title">The machines were already talking. Nobody was listening.</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>What the floor could not see</h3>
+        <p>Supervisors only learned a machine had stopped when they walked past it. There was no record of how long stops lasted, why they happened, or how much of each shift a machine actually spent knitting.</p>
+      </div>
+      <div class="card">
+        <h3>What was already on the wire</h3>
+        <p>Each controller sends a 645-byte status report to a fixed server IP every ~10.6 seconds using the vendor's GD NetLink protocol on UDP 3345. The protocol isn't publicly documented. I worked out its layout byte by byte from captured packets.</p>
+      </div>
+    </div>
+    <div class="callout teal" style="margin-top:14px"><strong>Design rule: listen only.</strong> The monitor never replies: no time sync, no file commands, nothing sent back. It can't affect production, which made it safe to deploy on a working floor.</div>
+  </section>
+
+  <!-- SETUP -->
+  <section class="section" id="setup">
+    <div class="section-label">Setup &amp; environment</div>
+    <h2 class="section-title">Two machines, one switch, one laptop</h2>
+    <div class="diagram" role="img" aria-label="Network diagram: two knitting machines send UDP status reports through an unmanaged Cisco switch to the monitor PC, which runs the listener and the dashboard.">
+      <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f59e0b"/></marker></defs>
+        <rect class="d-box" x="20" y="30" width="210" height="72" rx="8"/>
+        <text class="d-title" x="125" y="60" text-anchor="middle">Machine M-48</text>
+        <text class="d-sub" x="125" y="80" text-anchor="middle">GD-H122SA · NetLink client</text>
+        <rect class="d-box" x="20" y="150" width="210" height="72" rx="8"/>
+        <text class="d-title" x="125" y="180" text-anchor="middle">Machine M-555</text>
+        <text class="d-sub" x="125" y="200" text-anchor="middle">GD-H122SA · NetLink client</text>
+        <rect class="d-accent" x="340" y="88" width="200" height="76" rx="8"/>
+        <text class="d-title" x="440" y="118" text-anchor="middle">Cisco CBS110-24T</text>
+        <text class="d-sub" x="440" y="138" text-anchor="middle">unmanaged · 24 × 1 GbE</text>
+        <rect class="d-teal" x="640" y="70" width="240" height="112" rx="8"/>
+        <text class="d-title" x="760" y="100" text-anchor="middle">Monitor PC</text>
+        <text class="d-sub" x="760" y="120" text-anchor="middle">server.py · UDP 3345 (listen)</text>
+        <text class="d-sub" x="760" y="138" text-anchor="middle">dashboard · :8080</text>
+        <text class="d-sub" x="760" y="156" text-anchor="middle">CSV logs</text>
+        <path class="d-line" d="M230,66 C290,66 290,112 338,112" marker-end="url(#ah)"/>
+        <path class="d-line" d="M230,186 C290,186 290,142 338,142" marker-end="url(#ah)"/>
+        <path class="d-line" d="M540,126 L638,126" marker-end="url(#ah)"/>
+        <text class="d-label" x="285" y="22" text-anchor="middle">UDP 3345 · every 10.6 s</text>
+        <text class="d-label" x="589" y="116" text-anchor="middle">USB GbE</text>
+        <text class="d-sub" x="450" y="250" text-anchor="middle">One direction only: machines → monitor. The monitor never replies.</text>
+      </svg>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Item</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Knitting machines</strong></td><td>2 × JINHAO (JOMDA) GD-H122SA flat knitting machines, 52″ knitting width, gauge 5/7G, built 2025</td></tr>
+        <tr><td><strong>Network switch</strong></td><td>Cisco CBS110-24T, unmanaged with 24 Gigabit ports. No configuration needed.</td></tr>
+        <tr><td><strong>Monitor PC</strong></td><td>HP EliteBook 840 G7 with a USB Gigabit Ethernet adapter, given a static IP that matches the server address stored on the machine panels</td></tr>
+        <tr><td><strong>Software</strong></td><td>Python 3.11 using only the standard library, plus one HTML dashboard page served at <code>localhost:8080</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="photo-grid">
+      <figure class="shot"><img src="knitting-monitor/monitor-station.jpg" alt="Monitor station: laptop running the dashboard, USB Ethernet adapter and Cisco switch on a desk" loading="lazy"/><figcaption><strong>Monitor station.</strong> Laptop with a USB GbE adapter connected to the machines' switch, with the dashboard open.</figcaption></figure>
+      <figure class="shot"><img src="knitting-monitor/machine-panel.jpg" alt="Machine control panel Drive Information screen showing error 13101 PRESS OFF ERROR" loading="lazy"/><figcaption><strong>Machine panel at 13:24.</strong> Used to check the monitor's values against what the machine itself showed (see Verification).</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- CAPTURE -->
+  <section class="section" id="capture">
+    <div class="section-label">How the data is captured</div>
+    <h2 class="section-title">From UDP packet to dashboard</h2>
+    <ol class="steps">
+      <li><strong>Machine sends</strong>Each machine sends a 645-byte status report (command <code>0x9102</code>) every ~10.6 s, plus a small time-sync request (<code>0x9101</code>) every ~18 s. Both carry a CRC-16 checksum.</li>
+      <li><strong>Monitor receives and validates</strong><code>server.py</code> listens on UDP 3345, checks the magic bytes and CRC, and decodes the report in <code>netlink_proto.py</code>. Invalid packets are counted and dropped. Nothing is ever sent back.</li>
+      <li><strong>Identifies the machine</strong>Normally one IP means one machine. Both machines on site turned out to share an IP and MAC address (a factory default), so the monitor tells them apart by each one's power-on minute counter, with the packet sequence number and pattern as tie-breakers.</li>
+      <li><strong>Tracks state</strong>A stop opens at the first non-RUN report and closes at the next RUN report. A machine counts as offline after 30 s without a report while running, or 180 s while stopped, because machines go silent for 30–80 s while an error dialog is on screen.</li>
+      <li><strong>Translates alarms</strong>Alarm codes are translated with the vendor's FLAT alarm table (92 codes, English and Chinese). Start, end and duration are recorded, and the raw packet of every new alarm is saved for later analysis.</li>
+      <li><strong>Logs and serves</strong>Writes <code>events.csv</code>, <code>stops.csv</code> and a once-a-minute <code>snapshots.csv</code>, all of which open in Excel. The browser polls <code>/api/state</code> every 2 s, with an optional sound alert on a new stop or alarm.</li>
+    </ol>
+  </section>
+
+  <!-- PROTOCOL -->
+  <section class="section" id="protocol">
+    <div class="section-label">Reverse engineering</div>
+    <h2 class="section-title">Status report layout</h2>
+    <p class="section-desc">These are the byte offsets I decoded from the 645-byte report. All numbers are little-endian, and the frame ends with a CRC-16/CCITT-FALSE checksum. I confirmed each field against the machine panel, the wall clock or an independent parser.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Offset</th><th>Size</th><th>Field</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">0x00</td><td class="mono">3</td><td>magic <code>1A 52 93</code></td><td class="mono">0x53</td><td class="mono">u16</td><td>plan quantity</td></tr>
+        <tr><td class="mono">0x03</td><td class="mono">1</td><td>sequence number</td><td class="mono">0x55</td><td class="mono">u16</td><td>done quantity</td></tr>
+        <tr><td class="mono">0x04</td><td class="mono">u16</td><td>command <code>0x9102</code></td><td class="mono">0x57</td><td class="mono">u16</td><td>waste quantity</td></tr>
+        <tr><td class="mono">0x08</td><td class="mono">u16</td><td>length L (packet = L + 10)</td><td class="mono">0x59</td><td class="mono">u16</td><td>seconds for last piece</td></tr>
+        <tr><td class="mono">0x0A</td><td class="mono">1</td><td>machine model code</td><td class="mono">0x5B</td><td class="mono">u16</td><td>speed (mm/s)</td></tr>
+        <tr><td class="mono">0x0F</td><td class="mono">1</td><td>run state (0 STOP · 1 RUN · 2 INCH)</td><td class="mono">0x5D / 0x5F</td><td class="mono">u16</td><td>total rows / current row</td></tr>
+        <tr><td class="mono">0x10</td><td class="mono">1</td><td>work mode (3 = Knit Run)</td><td class="mono">0x61 / 0x63</td><td class="mono">u16</td><td>power-on min / knitting min</td></tr>
+        <tr><td class="mono">0x11</td><td class="mono">1</td><td>active alarm count</td><td class="mono">0x8F + 5·i</td><td class="mono">u16+3</td><td>alarm code i</td></tr>
+        <tr><td class="mono">0x12</td><td class="mono">65</td><td>pattern file name</td><td class="mono">L+8</td><td class="mono">u16</td><td>CRC-16/CCITT-FALSE</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="section" id="dashboard">
+    <div class="section-label">The dashboard</div>
+    <h2 class="section-title">Five views, one page</h2>
+    <p class="section-desc">Screenshots marked <em>live</em> show the real machines. Screenshots marked <em>simulated</em> come from a separate test copy fed by a fake-floor generator, used to show alarm, stop and offline states. The test copy writes its own logs, so test data never mixes with real data.</p>
+    <div class="shots">
+      <figure class="shot"><a href="knitting-monitor/dash-overview.png" target="_blank"><img src="knitting-monitor/dash-overview.png" alt="Overview tab with live data: header counts and one card per machine" loading="lazy"/></a><figcaption><strong>Overview (live).</strong> State counts, an attention list, and one card per machine showing pattern, row progress, pieces, speed, waste, last-piece time and knitting/power-on time. The orange bar warns about the shared IP.</figcaption></figure>
+      <figure class="shot"><a href="knitting-monitor/dash-overview-sim.png" target="_blank"><img src="knitting-monitor/dash-overview-sim.png" alt="Overview tab with simulated machines showing alarm, stop and offline states" loading="lazy"/></a><figcaption><strong>Overview with problems (simulated).</strong> A stop with two alarms, a running machine with an unknown alarm code, offline machines, a stop without an alarm, and two machines sharing an IP.</figcaption></figure>
+      <div class="shot-row">
+        <figure class="shot"><a href="knitting-monitor/dash-machine-page.png" target="_blank"><img src="knitting-monitor/dash-machine-page.png" alt="Machine detail page with run-state timeline, speed and row charts, stop and event logs" loading="lazy"/></a><figcaption><strong>Machine page (live).</strong> Run-state timeline, speed and current-row charts, stop log, alarm log, pattern history and events.</figcaption></figure>
+        <figure class="shot"><a href="knitting-monitor/dash-machine-data.png" target="_blank"><img src="knitting-monitor/dash-machine-data.png" alt="Machine data comparison table with one column per machine" loading="lazy"/></a><figcaption><strong>Machine data (live).</strong> One column per machine with every value from the status report, grouped by Status, Production, Progress, Counters and Monitoring.</figcaption></figure>
+      </div>
+      <div class="shot-row">
+        <figure class="shot"><a href="knitting-monitor/dash-stops-sim.png" target="_blank"><img src="knitting-monitor/dash-stops-sim.png" alt="Stops and alarms tab with downtime ranked by reason" loading="lazy"/></a><figcaption><strong>Stops &amp; alarms (simulated).</strong> Downtime ranked by reason (a Pareto view), downtime per machine, and full stop and alarm logs with the vendor's alarm text.</figcaption></figure>
+        <figure class="shot"><a href="knitting-monitor/dash-diagnostics.png" target="_blank"><img src="knitting-monitor/dash-diagnostics.png" alt="Diagnostics tab with packet counters and colour-coded raw status packet" loading="lazy"/></a><figcaption><strong>Diagnostics (live).</strong> Packet counters, report interval per machine, sequence jumps, restarts, and the raw 645-byte packet with every byte coloured by field.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERIFICATION -->
+  <section class="section" id="verification">
+    <div class="section-label">Source of truth</div>
+    <h2 class="section-title">Nothing on the dashboard is estimated</h2>
+    <p class="section-desc">I checked every value against an independent source: the machine's own screen, the wall clock, or a second decoder written separately.</p>
+    <h3>Machine panel vs monitor, same minute</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Value</th><th>Machine panel (13:24)</th><th>Monitor record (13:23:50)</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Pattern file</td><td class="mono">POLO-N-SS.000</td><td class="mono">POLO-N-SS.000</td><td><span class="pill pill-ok">match</span></td></tr>
+        <tr><td>Pieces (done / plan)</td><td class="mono">1 / 48</td><td class="mono">done 1, plan 48</td><td><span class="pill pill-ok">match</span></td></tr>
+        <tr><td>Rows (current / total)</td><td class="mono">460 / 460</td><td class="mono">row 460, rows 460</td><td><span class="pill pill-ok">match</span></td></tr>
+        <tr><td>Speed</td><td class="mono">00.700 m/s</td><td class="mono">700</td><td><span class="pill pill-ok">unit = mm/s</span></td></tr>
+        <tr><td>Error</td><td class="mono">13101: PRESS OFF ERROR</td><td>silent, then STOP with no alarm code</td><td><span class="pill pill-bad">not transmitted</span></td></tr>
+      </tbody>
+    </table></div>
+    <h3 style="margin-top:24px">Other checks</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Check</th><th>Evidence</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Independent decoder</strong></td><td>A separately written byte parser decoded the captured packets. All 17 fields were identical, and the CRC was valid on every packet.</td><td><span class="pill pill-ok">pass</span></td></tr>
+        <tr><td><strong>Power-on counter = minutes</strong></td><td>The counter rose by 71 over 71.6 min and 70.6 min of PC-clock time. Knitting minutes never exceeded power-on minutes.</td><td><span class="pill pill-ok">pass</span></td></tr>
+        <tr><td><strong>Last-piece seconds</strong></td><td>At the measured ~1.15 rows/s, a 1,088-row pattern should take ≈ 946 s. The machines reported 924–969 s.</td><td><span class="pill pill-ok">pass</span></td></tr>
+        <tr><td><strong>Stop, state and alarm arithmetic</strong></td><td>Scenario tests drove the real server code with a fake clock: alarm stop, offline, restart, shared IP and identical counters. The totals always added up.</td><td><span class="pill pill-obs">pass after fixes</span></td></tr>
+        <tr><td><strong>Edge cases</strong></td><td>7 simulated machines covered 50 s of silence during an alarm, an unknown code, going offline while running, a counter reset, a 65535 → 0 counter wrap, zero plan or rows, and an empty pattern.</td><td><span class="pill pill-ok">pass</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="section" id="results">
+    <div class="section-label">First day on the floor</div>
+    <h2 class="section-title">What 95 minutes of real production showed</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Machine</th><th>Power-on</th><th>Knitting</th><th>Knitting / on</th><th>Speed min / avg / max</th><th>One set (SS+SB+SF)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>M-555</strong></td><td class="num">95 min</td><td class="num">92 min</td><td class="num"><strong>97%</strong></td><td class="num">400 / 715 / 900</td><td class="num">≈ 38.5 min</td></tr>
+        <tr><td><strong>M-48</strong></td><td class="num">94 min</td><td class="num">74 min</td><td class="num"><strong>79%</strong></td><td class="num">650 / 778 / 900</td><td class="num">≈ 36.7 min</td></tr>
+      </tbody>
+    </table></div>
+    <h3 style="margin-top:24px">Stops recorded</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Machine</th><th>Start</th><th>Duration</th><th>Reason (machine feedback)</th></tr></thead>
+      <tbody>
+        <tr><td>M-48</td><td class="mono">13:23:42</td><td class="num">≈ 2m 17s</td><td>Panel showed 13101 PRESS OFF ERROR. The network showed silence, then a STOP with no alarm code.</td></tr>
+        <tr><td>M-48</td><td class="mono">13:31:34</td><td class="num">1m 30s</td><td>Alarm 59: Fabric wrapped on main roller (front)</td></tr>
+        <tr><td>M-555</td><td class="mono">13:47:51</td><td class="num">21s</td><td>No alarm reported</td></tr>
+        <tr><td>M-555</td><td class="mono">13:51:09</td><td class="num">1m 15s</td><td>Alarm 62: Large yarn knot detected</td></tr>
+        <tr><td>M-48</td><td class="mono">≈ 14:30:30</td><td class="num"><strong>≈ 16m 45s</strong></td><td><strong>No alarm reported</strong></td></tr>
+        <tr><td>M-555</td><td class="mono">14:50:01</td><td class="num">53s</td><td>No reports received, then STOP</td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:12px;color:var(--text-muted)">Short stops (≤ 21 s) are partly omitted here. The monitor was restarted several times during development, so very short stops at those moments may be missing.</p>
+    <div class="callout red" style="margin-top:16px"><strong>The biggest loss wasn't a machine fault.</strong> M-48 lost about 21 of 95 minutes (≈ 22%), and about 17 of those minutes were stops with no machine alarm at all. Machine errors were short, 1–2 minutes each. Only a monitor like this makes that operator and material time visible.</div>
+  </section>
+
+  <!-- EFFICIENCY -->
+  <section class="section" id="efficiency">
+    <div class="section-label">Impact</div>
+    <h2 class="section-title">Turning the data into efficiency</h2>
+    <div class="grid-2">
+      <div class="card"><h3>Operator</h3><p>Reacts to a stop in seconds instead of when walking past, knows the error before reaching the machine, and can be ready when a piece is about to come off (SS pieces every ~6 min, SB/SF every ~16 min).</p></div>
+      <div class="card"><h3>Line supervisor</h3><p>Spots machines standing still with no alarm, balances operators across machines, and checks that speed settings match the standard.</p></div>
+      <div class="card"><h3>Maintenance</h3><p>Fixes recurring faults first using downtime by reason: fabric wrapping points to a take-down or roller tension check, and yarn knots point to the yarn supplier or splicing quality.</p></div>
+      <div class="card"><h3>Planning</h3><p>Uses real cycle times instead of estimates. One set takes ≈ 37–39 min, so a machine at 97% utilisation makes ≈ 1.5 sets per hour, and at 79% ≈ 1.3.</p></div>
+    </div>
+    <div class="callout green" style="margin-top:14px"><strong>Projection:</strong> if M-48 had matched M-555 (97% instead of 79%), it would have knitted ~17 more minutes in 95, roughly half a set. Over a 3-shift day that is about 4 extra hours of knitting from one machine. This is projected from 95 minutes of data and needs confirming over several days.</div>
+  </section>
+
+  <!-- FINDINGS -->
+  <section class="section" id="findings">
+    <div class="section-label">Findings &amp; next steps</div>
+    <h2 class="section-title">Recommendations from the deployment</h2>
+    <div class="grid-3">
+      <div class="card"><h3>Unique IP per machine</h3><p>Both controllers shipped with the same IP and MAC address. The monitor copes, but the vendor's NetLink software would merge them. Each machine needs its own IP before more are added.</p></div>
+      <div class="card"><h3>Not every error is sent</h3><p>Panel error 13101 (PRESS OFF ERROR) stopped a machine without transmitting an alarm code, so these errors need recording by hand for now.</p></div>
+      <div class="card"><h3>Controller clock drift</h3><p>One controller's time-sync request carried a 2007 date, so its own panel logs have wrong timestamps. Set the clock.</p></div>
+      <div class="card"><h3>Always-on monitor PC</h3><p>Logs are only complete while the monitor runs. Use a dedicated PC that starts it automatically. Only one program can bind UDP 3345.</p></div>
+      <div class="card"><h3>Daily no-alarm review</h3><p>The largest loss had no machine error, so reviewing no-alarm stops with supervisors is where the time is.</p></div>
+      <div class="card"><h3>Scale out</h3><p>The monitor handles any number of machines on the same 24-port switch, with one card and one column each.</p></div>
+    </div>
+    <h3 style="margin-top:28px">Limitations</h3>
+    <ul class="check-list">
+      <li>Stop start and end times are accurate to one report (~10 s).</li>
+      <li>Only shows what the machines send. Operator IDs, order numbers and some panel errors aren't available.</li>
+      <li>The alarm block isn't yet confirmed from raw bytes (codes 59 and 62 decoded to sensible texts). The monitor now saves every alarm packet to close this gap.</li>
+      <li>Results cover 95 minutes on 2 machines. Trends need several days of data.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section-label">Stack</div>
+    <h2 class="section-title">What it's built with</h2>
+    <div class="grid-3">
+      <div class="card"><h3>Receiver</h3><p><code>server.py</code> handles the UDP listener, state, stop and alarm logic, CSV logs and the JSON API, using only Python's standard library.</p></div>
+      <div class="card"><h3>Decoder</h3><p><code>netlink_proto.py</code> parses GD NetLink frames and status reports, with CRC checking and a built-in self-test.</p></div>
+      <div class="card"><h3>Testing</h3><p>Scenario tests drive the real server code with a fake clock, and <code>fake_floor.py</code> simulates machines on loopback IPs.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="page" style="max-width:1100px;margin:72px auto 0">
+  <span>© 2026 Julfiker Ibn Haider · Southern IoT</span>
+  <span><a href="index.html">Portfolio</a> · <a href="My_CV.pdf" target="_blank">Resume</a></span>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-btn');
+    function sync() { btn.textContent = root.getAttribute('data-theme') === 'light' ? 'Dark' : 'Light'; }
+    sync();
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      sync();
+    });
+  })();
+</script>
+</body>
+</html>
