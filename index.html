@@ -331,6 +331,31 @@
       transform: translateY(-2px);
     }
 
+    /* GrabCAD / 3D design button — teal so it reads apart from the amber CTAs */
+    .btn-cad {
+      border: 1px solid var(--teal);
+      background: var(--teal-bg);
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: var(--teal);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn-cad:hover {
+      background: var(--teal);
+      color: #000;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(45,212,191,0.25);
+    }
+    .btn-cad-lg { padding: 12px 22px; margin-top: 22px; }
+
     /* ── HERO ── */
     .hero {
       display: grid;
@@ -499,6 +524,8 @@
       margin-bottom: 40px;
     }
 
+    #skills .skills-grid { grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); }
+
     .skill-icon {
       font-size: 1.8rem;
       color: var(--primary);
@@ -523,6 +550,50 @@
       letter-spacing: 0.04em;
       color: var(--text-dim);
     }
+
+    /* ── 3D DESIGN FEATURE ── */
+    .cad-feature {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 32px;
+      align-items: center;
+      padding: 32px;
+      border: 1px solid rgba(45,212,191,0.28);
+      border-radius: 12px;
+      background:
+        radial-gradient(ellipse 70% 90% at 0% 0%, var(--teal-bg), transparent 70%),
+        var(--bg-card);
+      position: relative;
+      z-index: 1;
+    }
+    .cad-overline {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: var(--teal);
+      margin-bottom: 10px;
+    }
+    .cad-text h3 { font-size: clamp(1.2rem, 2.2vw, 1.5rem); font-weight: 700; line-height: 1.3; margin-bottom: 12px; }
+    .cad-text p { color: var(--text-dim); font-size: 14px; line-height: 1.75; }
+    .cad-certs { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+    .cad-certs i { color: var(--teal); margin-right: 4px; }
+    .cad-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .cad-list a {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      border-radius: 8px;
+      background: var(--bg-card);
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .cad-list a:hover { border-color: var(--teal); transform: translateX(4px); }
+    .cad-name { color: var(--text-light); font-weight: 600; font-size: 14px; }
+    .cad-meta { color: var(--text-muted); font-family: var(--mono); font-size: 11px; }
 
     /* ── TIMELINE ── */
     .timeline { position: relative; padding-left: 28px; }
@@ -720,6 +791,7 @@
       .nav-right { gap: 0; }
       .contact-grid { grid-template-columns: 1fr; }
       .thesis-grid { grid-template-columns: 1fr; }
+      .cad-feature { grid-template-columns: 1fr; padding: 22px; }
     }
 
     /* Scroll fade-up */
@@ -768,7 +840,7 @@
       <div class="hero">
         <div>
           <div class="hero-badge"><i class="fas fa-bolt"></i>&nbsp; Available for opportunities</div>
-          <h1>Building the bridge between <span>silicon</span> and <span>cloud</span></h1>
+          <h1>Listening to <span>machines</span> that were never meant to <span>talk</span></h1>
           <p class="hero-desc">
             Mechatronics & Industrial Engineering graduate from CUET, Implementation Lead & Hardware
             Designer at Southern IoT. I architect intelligent systems — from LoRaWAN industrial networks
@@ -777,7 +849,7 @@
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <a href="#projects" class="btn-primary"><i class="fas fa-arrow-right"></i> Explore work</a>
             <a href="My_CV.pdf" class="btn-secondary" target="_blank"><i class="fas fa-file-pdf"></i> Resume</a>
-            <a href="https://grabcad.com/alif.haider-1" class="btn-secondary" target="_blank"><i class="fas fa-cube"></i> Grabcad</a>
+            <a href="https://grabcad.com/alif.haider-1" class="btn-cad" target="_blank" rel="noopener"><i class="fas fa-cube"></i> GrabCAD 3D</a>
           </div>
         </div>
 
@@ -839,15 +911,53 @@
             </div>
           </div>
           <div class="skill-card">
-            <div class="skill-icon"><i class="fas fa-drafting-compass"></i></div>
-            <div class="skill-cat">Hardware & Design</div>
+            <div class="skill-icon"><i class="fas fa-tools"></i></div>
+            <div class="skill-cat">Hardware & Fabrication</div>
             <div class="skill-tags">
               <span class="skill-tag">PCB Design</span>
-              <span class="skill-tag">SolidWorks</span>
               <span class="skill-tag">CNC/GRBL</span>
               <span class="skill-tag">Sensor Fusion</span>
             </div>
           </div>
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-cube"></i></div>
+            <div class="skill-cat">3D CAD</div>
+            <div class="skill-tags">
+              <span class="skill-tag">SolidWorks</span>
+              <span class="skill-tag">Enclosure Design</span>
+              <span class="skill-tag">Mechanisms</span>
+              <span class="skill-tag">CAD/CAM</span>
+              <span class="skill-tag">STEP · STL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D design highlight -->
+        <div class="cad-feature">
+          <div class="cad-text">
+            <div class="cad-overline"><i class="fas fa-cube"></i>&nbsp; 3D DESIGN</div>
+            <h3>I design the hardware, not just the firmware inside it</h3>
+            <p>
+              Enclosures, machine frames and mechanisms modelled in SolidWorks, from first sketch
+              to manufacturable parts: rugged DIN-rail enclosures for industrial sites, CNC machine
+              structures, and the mechanics of the automatic wire bending machine.
+            </p>
+            <div class="cad-certs">
+              <span><i class="fas fa-certificate"></i> SolidWorks 3D Creator Associate</span>
+              <span><i class="fas fa-certificate"></i> SolidWorks CAD Design Associate</span>
+            </div>
+            <a href="https://grabcad.com/alif.haider-1" target="_blank" rel="noopener" class="btn-cad btn-cad-lg">
+              <i class="fas fa-cube"></i> View my 3D models on GrabCAD <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+          <ul class="cad-list">
+            <li><a href="project-1.html#enclosure"><span class="cad-name">CareFlow V1 enclosure</span><span class="cad-meta">Interactive 3D viewer · STL</span></a></li>
+            <li><a href="project-8.html"><span class="cad-name">Pocket oscilloscope case</span><span class="cad-meta">Downloadable STEP model</span></a></li>
+            <li><a href="project-3.html"><span class="cad-name">Wire bending mechanism</span><span class="cad-meta">Machine design</span></a></li>
+            <li><a href="project-2.html"><span class="cad-name">CNC router frame</span><span class="cad-meta">Structure &amp; motion system</span></a></li>
+            <li><a href="https://grabcad.com/alif.haider-1" target="_blank" rel="noopener"><span class="cad-name">TurtleBot</span><span class="cad-meta">Mobile robot model · GrabCAD ↗</span></a></li>
+            <li><a href="https://grabcad.com/alif.haider-1" target="_blank" rel="noopener"><span class="cad-name">Office inventory</span><span class="cad-meta">Office equipment &amp; furniture models · GrabCAD ↗</span></a></li>
+          </ul>
         </div>
       </section>
 
