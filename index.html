@@ -136,6 +136,23 @@
     .btn-cad:hover { background: var(--ind-orange-fill); color: var(--ind-on-orange); }
     .btn-cad:hover i { color: var(--ind-on-orange); }
     .btn-cad-lg { margin-top: 24px; padding: 13px 22px; }
+    /* CAD portfolio: the highlighted link; GrabCAD sits beside it, smaller */
+    .nav-links a.nav-cad { color: var(--ind-on-orange); background: var(--ind-orange-fill); padding: 5px 10px; border: 2px solid #000; box-shadow: 2px 2px 0 #000; }
+    .nav-links a.nav-cad:hover { box-shadow: 3px 3px 0 #000; }
+    .btn-cad-hero { background: var(--ind-orange-fill); color: var(--ind-on-orange); box-shadow: 4px 4px 0 #000; }
+    .btn-cad-hero i { color: var(--ind-on-orange); }
+    .btn-cad-hero:hover { background: var(--ind-ink); color: var(--ind-paper); }
+    .live-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; padding: 2px 6px; margin-left: 4px; background: #1c1b19; color: #7CFC9A; }
+    .link-grabcad { align-self: center; font-family: var(--mono); font-size: 13px; color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; }
+    .link-grabcad:hover { color: var(--primary); }
+    .cad-grabcad { display: inline-block; margin-top: 14px; margin-left: 4px; font-family: var(--mono); font-size: 12.5px; color: var(--c-muted); text-decoration: underline; text-underline-offset: 3px; }
+    .cad-grabcad:hover { color: #ede6d6; }
+    .cad-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .cad-preview { position: relative; display: block; border: 2px solid #000; background: linear-gradient(180deg,#f3f6f8,#e5ebee); box-shadow: 4px 4px 0 #000; overflow: hidden; transition: transform .2s, box-shadow .2s; }
+    .cad-preview:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #000; }
+    .cad-preview img { display: block; width: 100%; height: auto; }
+    .cad-preview-tag { position: absolute; left: 10px; bottom: 10px; font-family: var(--mono); font-size: 11px; background: rgba(255,255,255,.9); color: #1c1b19; padding: 4px 8px; border: 1px solid #000; display: flex; align-items: center; gap: 6px; }
+    .cad-preview-tag .dot { width: 7px; height: 7px; border-radius: 50%; background: #34C759; }
 
     /* ── HERO ── */
     .hero {
@@ -565,6 +582,7 @@
         <li><a href="#projects">Projects</a></li>
         <li><a href="#education">Education</a></li>
         <li><a href="#contact">Contact</a></li>
+        <li><a href="https://cad-portfolio.julfikerhaider2001.workers.dev/" class="nav-cad"><i class="fas fa-cube"></i> 3D CAD</a></li>
         <li><a href="My_CV.pdf" target="_blank" style="color:var(--primary);">Resume</a></li>
       </ul>
       <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode"><i class="fas fa-moon icon-moon" aria-hidden="true"></i><i class="fas fa-sun icon-sun" aria-hidden="true"></i></button>
@@ -587,7 +605,8 @@
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <a href="#projects" class="btn-primary"><i class="fas fa-arrow-right"></i> Explore work</a>
             <a href="My_CV.pdf" class="btn-secondary" target="_blank"><i class="fas fa-file-pdf"></i> Resume</a>
-            <a href="https://grabcad.com/alif.haider-1" class="btn-cad" target="_blank" rel="noopener"><i class="fas fa-cube"></i> GrabCAD 3D</a>
+            <a href="https://cad-portfolio.julfikerhaider2001.workers.dev/" class="btn-cad btn-cad-hero"><i class="fas fa-cube"></i> 3D CAD Portfolio <span class="live-tag">LIVE 3D</span></a>
+            <a href="https://grabcad.com/alif.haider-1" class="link-grabcad" target="_blank" rel="noopener">GrabCAD ↗</a>
           </div>
         </div>
 
@@ -684,10 +703,16 @@
               <span><i class="fas fa-certificate"></i> SolidWorks 3D Creator Associate</span>
               <span><i class="fas fa-certificate"></i> SolidWorks CAD Design Associate</span>
             </div>
-            <a href="https://grabcad.com/alif.haider-1" target="_blank" rel="noopener" class="btn-cad btn-cad-lg">
-              <i class="fas fa-cube"></i> View my 3D models on GrabCAD <i class="fas fa-arrow-right"></i>
+            <a href="https://cad-portfolio.julfikerhaider2001.workers.dev/" class="btn-cad btn-cad-lg">
+              <i class="fas fa-cube"></i> Open my 3D CAD portfolio <i class="fas fa-arrow-right"></i>
             </a>
+            <a href="https://grabcad.com/alif.haider-1" target="_blank" rel="noopener" class="cad-grabcad">or download the CAD files on GrabCAD ↗</a>
           </div>
+          <div class="cad-side">
+          <a href="https://cad-portfolio.julfikerhaider2001.workers.dev/" class="cad-preview" aria-label="Open the 3D CAD portfolio">
+            <img src="https://cad-portfolio.julfikerhaider2001.workers.dev/media/water-sensor-enclosure/poster.webp" alt="Water monitoring enclosure, live 3D model" loading="lazy" width="1600" height="860">
+            <span class="cad-preview-tag"><span class="dot"></span> 12 live 3D models · drag to rotate</span>
+          </a>
           <ul class="cad-list">
             <li><a href="project-1.html#enclosure"><span class="cad-name">CareFlow V1 enclosure</span><span class="cad-meta">Interactive 3D viewer · STL</span></a></li>
             <li><a href="project-8.html"><span class="cad-name">Pocket oscilloscope case</span><span class="cad-meta">Downloadable STEP model</span></a></li>
@@ -696,6 +721,7 @@
             <li><a href="https://grabcad.com/alif.haider-1" target="_blank" rel="noopener"><span class="cad-name">TurtleBot</span><span class="cad-meta">Mobile robot model · GrabCAD ↗</span></a></li>
             <li><a href="https://grabcad.com/alif.haider-1" target="_blank" rel="noopener"><span class="cad-name">Office inventory</span><span class="cad-meta">Office equipment &amp; furniture models · GrabCAD ↗</span></a></li>
           </ul>
+          </div>
         </div>
       </section>
 
